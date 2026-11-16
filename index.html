@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사주×MBTI 조합 결과</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 친구가 보내준 밈 테스트 — 장난스럽지만 깔끔하게
+   IDEA: 오행 색깔 부적 카드 한 장이 결과
+   PICTURE: 일간 오행 색으로 꽉 찬 결과 카드 (공유 이미지와 같은 모양)
+   COLOUR/TYPE: 오행 5색이 카드를 지배, 배경은 한지 흰색/밤엔 먹색; Black Han Sans 별명, Noto Sans KR 본문
+   LAYOUT: 한 열 — 입력(생일·MBTI) → 결과 카드 → 저장/복사 */
+:root{color-scheme:light dark;--bg:light-dark(#f7f4ee,#14130f);--ink:light-dark(#1b1a17,#f2efe8);--sub:light-dark(#6b665c,#a8a296);--line:light-dark(#ddd6c8,#34312a);--panel:light-dark(#fff,#1d1b17);--el:#2f8f4e}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans KR",system-ui,sans-serif;overflow-x:clip;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:560px;margin:0 auto;padding:28px 18px 60px}
+h1{font:400 34px/1.1 "Black Han Sans",sans-serif;margin:0 0 4px;letter-spacing:-.5px;text-wrap:balance}
+.lead{color:var(--sub);margin:0 0 22px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+label.t{display:block;font-weight:700;margin:0 0 8px}
+input[type=date]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:48px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:12px 0 18px;color:var(--sub);font-size:14px}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none}
+.mb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mb button{min-height:56px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:400 24px "Black Han Sans",sans-serif;cursor:pointer}
+.mb button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mb small{display:block;font:12px "Noto Sans KR",sans-serif;opacity:.7}
+.go{width:100%;margin-top:16px;min-height:54px;border:0;border-radius:14px;background:var(--el);color:#fff;font:400 22px "Black Han Sans",sans-serif;cursor:pointer;transition:background .3s}
+button:focus-visible,input:focus-visible{outline:3px solid #f0b400;outline-offset:2px}
+.err{color:#c43b2b;font-size:14px;margin:10px 0 0;min-height:1em}
+#res{margin-top:22px;display:none}
+.card{background:var(--el);color:#fff;border-radius:22px;padding:24px 22px 22px;position:relative;overflow:hidden;animation:pop .45s ease-out}
+.card::after{content:attr(data-han);position:absolute;right:-10px;top:-24px;font:900 150px/1 "Noto Sans KR",serif;opacity:.12;pointer-events:none}
+@keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}}
+@media(prefers-reduced-motion:reduce){.card{animation:none}}
+.tag{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700;font-size:15px}
+.chip{background:rgba(255,255,255,.2);border-radius:99px;padding:3px 12px;white-space:nowrap}
+.chip.hot{background:#fff;color:var(--el)}
+.nick{font:400 clamp(32px,9vw,44px)/1.1 "Black Han Sans",sans-serif;margin:16px 0 8px;text-wrap:balance;position:relative}
+.sum{font-size:17px;font-weight:700;margin:0 0 16px;opacity:.95}
+.box{background:rgba(0,0,0,.18);border-radius:14px;padding:14px 16px;margin-top:10px}
+.box b{display:block;font-size:13px;opacity:.8;margin-bottom:2px}
+.quote{margin-top:16px;background:#fff;color:#1b1a17;border-radius:14px;padding:16px;font:20px/1.4 "Gowun Dodum",sans-serif;font-weight:700;text-align:center}
+.acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.acts button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:700 14px "Noto Sans KR",sans-serif;cursor:pointer}
+#imgwrap{display:none;margin-top:14px;text-align:center}
+#imgwrap img{width:100%;max-width:360px;border-radius:14px;border:1px solid var(--line)}
+#imgwrap p{color:var(--sub);font-size:14px;margin:6px 0 0}
+.rare{margin:14px 0 0;font-size:14px;font-weight:700;opacity:.9;position:relative}
+#load{display:none;margin-top:22px;border-radius:22px;background:var(--panel);border:1px solid var(--line);min-height:300px;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding:30px}
+.orb{width:96px;height:96px;border-radius:50%;background:var(--el);display:grid;place-items:center;color:#fff;font:900 46px "Noto Sans KR",serif;animation:pulse .7s ease-in-out infinite alternate;transition:background .3s}
+@keyframes pulse{from{transform:scale(.9);box-shadow:0 0 0 0 var(--el)}to{transform:scale(1.06);box-shadow:0 0 0 18px transparent}}
+#lt{font:400 22px "Black Han Sans",sans-serif;min-height:1.4em}
+.card.flip{animation:flip .6s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes flip{from{transform:perspective(900px) rotateY(80deg) scale(.9);opacity:0}}
+@media(prefers-reduced-motion:reduce){.orb,.card.flip{animation:none}}
+.sit{margin-top:30px}
+.sit h2{font:400 26px/1.2 "Black Han Sans",sans-serif;margin:0 0 4px}
+.sit>p{color:var(--sub);margin:0 0 14px;font-size:15px}
+.sc{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px;border-top:6px solid var(--el)}
+.sc h3{font:400 22px "Black Han Sans",sans-serif;margin:0 0 12px}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.row:first-of-type{border-top:0;padding-top:0}
+.who{font-size:12px;font-weight:700;color:var(--el);background:color-mix(in srgb,var(--el) 14%,transparent);border-radius:8px;padding:4px 0;text-align:center;align-self:start;white-space:nowrap}
+.row b{display:block;font-size:17px;line-height:1.35;margin-bottom:2px}
+.row span{color:var(--sub);font-size:15px}
+.mt{margin-top:34px}
+.mt h2{font:400 26px/1.2 "Black Han Sans",sans-serif;margin:0 0 4px}
+.mt>p{color:var(--sub);margin:0 0 6px;font-size:15px}
+.mt h3{font:400 20px "Black Han Sans",sans-serif;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.mt h3 i{font:700 13px "Noto Sans KR",sans-serif;padding:3px 10px;border-radius:99px;background:#2f8f4e;color:#fff}
+.mt h3 i.bad{background:#c43b2b}
+.ml{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.mi{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:14px 16px}
+.rk{width:44px;height:44px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:400 22px "Black Han Sans",sans-serif}
+.mt1{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;font-weight:700}
+.c2{border-radius:99px;padding:2px 10px;background:color-mix(in srgb,var(--c) 16%,transparent);white-space:nowrap}
+.pct{margin-left:auto;color:var(--c);white-space:nowrap;font-size:15px}
+.mn{display:block;font:400 21px/1.25 "Black Han Sans",sans-serif;margin:6px 0 2px}
+.ms{color:var(--sub);font-size:15px}
+.why{margin:8px 0 0;padding:0;list-style:none;font-size:14px}
+.why li{padding-left:14px;position:relative}
+.why li::before{content:"";position:absolute;left:2px;top:.65em;width:6px;height:6px;border-radius:50%;background:var(--c)}
+.mi{cursor:pointer;transition:transform .15s}
+.mi:hover{transform:translateY(-2px)}
+.mi:focus-visible{outline:3px solid #f0b400;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.mi{transition:none}.mi:hover{transform:none}}
+.sk{margin:10px 0 0;background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:10px;padding:10px 12px;font-size:15px;line-height:1.5}
+.sk b{color:var(--c);margin-right:6px;white-space:nowrap}
+.more{display:block;margin-top:8px;font-size:13px;font-weight:700;color:var(--c)}
+.peek{display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 16px;margin-bottom:12px;font-weight:700}
+.peek button{min-height:44px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);font:700 14px "Noto Sans KR",sans-serif;padding:0 14px;cursor:pointer}
+.zone{--z:#2b9a55;border-radius:20px;padding:4px 12px 14px;margin-top:16px;background:color-mix(in srgb,var(--z) 9%,transparent);border:1px solid color-mix(in srgb,var(--z) 32%,transparent)}
+.zone.bad{--z:#d23f31}
+.zone h3{color:var(--z);margin:12px 2px 10px}
+.zone h3 i,.zone h3 i.bad{background:var(--z)}
+.c2.e{background:color-mix(in srgb,var(--e) 18%,transparent)}
+.mi.top{grid-template-columns:52px minmax(0,1fr);border-width:2px 2px 2px 8px;border-color:var(--c)}
+.mi.top .rk{width:52px;height:52px;font-size:26px}
+.mi.top .pct{font:400 34px/1 "Black Han Sans",sans-serif}
+.mi.top .mn{font-size:26px}
+.wy summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--sub);margin-top:6px;min-height:32px;display:flex;align-items:center}
+.tz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;width:100%;margin-top:12px;padding:0;border:0;background:none;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.tz:focus-visible{outline:3px solid #f0b400;outline-offset:2px;border-radius:14px}
+.tz span{display:block;border-radius:14px;padding:12px 14px;color:#fff;font-weight:700;font-size:13px;line-height:1.35}
+.tz .g{background:#2b9a55}.tz .r{background:#d23f31}
+.tz b{display:block;font:400 22px/1.2 "Black Han Sans",sans-serif;margin-top:2px}
+.tz small{display:block;font-size:12px;opacity:.85;margin-top:4px}
+.ask{width:100%;margin-top:16px;min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:700 15px "Noto Sans KR",sans-serif;cursor:pointer;padding:8px 12px}
+.how{margin-top:10px;font-size:14px;color:var(--sub)}
+.how summary{cursor:pointer;font-weight:700;color:var(--ink);min-height:44px;display:flex;align-items:center}
+.how p{margin:4px 0}
+.note{color:var(--sub);font-size:13px;margin-top:26px;line-height:1.6}
+.rx{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rx button{min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:inherit;font:700 14px "Noto Sans KR",sans-serif;cursor:pointer;white-space:nowrap}
+.rx button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rx .w{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;font-size:13px;font-weight:700}
+.rx .w button{min-height:34px;font-size:13px;padding:0 12px}
+.rx .st{font-size:13px;font-weight:700;opacity:.8;width:100%}
+.card .rx{position:relative}
+.card .rx button{border-color:rgba(255,255,255,.55)}
+.card .rx button.on{background:#fff;color:var(--el);border-color:#fff}
+.rxn{display:none;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;font-size:13px;color:var(--sub);margin:10px 2px 0}
+.rxn button{min-height:36px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:700 13px "Noto Sans KR",sans-serif;padding:0 12px;cursor:pointer}
+#memoT{width:100%;font:16px "Noto Sans KR",sans-serif;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);resize:vertical}
+.adm{margin-top:26px}
+.adm table{width:100%;border-collapse:collapse;font-size:13px}
+.adm td,.adm th{padding:6px 4px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.adm td.n{text-align:right;white-space:nowrap}
+.v-keep{color:#2b9a55;font-weight:700}.v-swap{color:#d23f31;font-weight:700}.v-ab{color:#b67a12;font-weight:700}
+.gban{background:var(--panel);border:2px solid var(--ink);border-radius:18px;padding:14px 16px;margin:0 0 16px}
+.gban b{display:block;font:400 22px/1.2 "Black Han Sans",sans-serif}
+.gban p{margin:4px 0 0;font-size:15px}
+.gban .s{color:var(--sub);font-size:14px}
+.gban button{min-height:44px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font:700 15px "Noto Sans KR",sans-serif;padding:0 16px;cursor:pointer;margin-top:10px}
+.gn{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:48px}
+.gq{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+.gq p{margin:0 0 8px;font-weight:700;font-size:14px;color:var(--sub)}
+.ab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.ab button{min-height:52px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:700 15px/1.3 "Noto Sans KR",sans-serif;cursor:pointer;padding:6px 8px}
+.ab button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gsvg{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:18px;margin-top:8px;color:var(--ink)}
+.gh{font-weight:700;margin:0}
+.gs{color:var(--sub);font-size:13px;margin:6px 0 0}
+.gp{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.gp li{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--z);border-radius:12px;padding:10px 12px}
+.gp b{font:400 19px "Black Han Sans",sans-serif}
+.gp span{color:var(--sub);font-size:14px}
+.gb{margin-top:10px}
+.gb p{margin:0 0 4px;font-weight:700;font-size:15px}
+.gbar{display:flex;height:30px;border-radius:8px;overflow:hidden;background:var(--line)}
+.gbar span{display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px "Noto Sans KR",sans-serif;min-width:24px}
+.gb small{display:block;color:var(--sub);font-size:13px;margin-top:3px}
+.glg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;margin-top:10px;font-size:13px;font-weight:700}
+.glg span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glg i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;color:#fff;font:700 11px "Noto Sans KR",sans-serif;font-style:normal;margin-right:6px;vertical-align:-5px}
+.glg small{color:var(--sub);font-weight:400}
+.spb{position:relative;margin-top:12px;width:100%;min-height:44px;border:2px solid rgba(255,255,255,.7);border-radius:12px;background:rgba(0,0,0,.22);color:#fff;font:700 15px "Noto Sans KR",sans-serif;cursor:pointer}
+
+.card.hot .spb{background:#ff3b1f;border-color:#ff3b1f}
+.ft{margin-top:10px;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--el);border-radius:14px;padding:12px 14px}
+.ft small{display:block;color:var(--sub);font-size:13px;font-weight:700}
+.ft b{display:block;font-size:17px;line-height:1.45;margin:4px 0 2px}
+.ft span{display:block;color:var(--sub);font-size:14px}
+.gb .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.gsh{margin-top:14px}
+.gsh p{margin:0 0 6px;font-weight:700}
+.balsec{margin-top:34px;padding-top:22px;border-top:2px dashed var(--line)}
+.balsec>p{color:var(--sub);margin:0 0 6px;font-size:15px}
+.sm3{display:grid;gap:6px}
+.sm3 div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sm3 button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:400 20px "Black Han Sans",sans-serif;cursor:pointer}
+.sm3 button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sm3 small{display:block;font:12px "Noto Sans KR",sans-serif;opacity:.7}
+input:disabled{opacity:.45}
+.sres{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.sl{margin:0;font-weight:700}
+.sp{margin:2px 0 8px;font:400 clamp(40px,11vw,56px)/1 "Black Han Sans",sans-serif;color:var(--el)}
+.shl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.sbx{border:0;border-radius:14px;padding:12px;color:#fff;text-align:left;font:700 13px/1.35 "Noto Sans KR",sans-serif;cursor:pointer}
+.sbx.g{background:#2b9a55}.sbx.r{background:#d23f31}
+.sbx b{display:block;font:400 20px/1.2 "Black Han Sans",sans-serif;margin:2px 0}
+.sbx small{display:block;font-size:12px;opacity:.9;font-weight:400}
+.srow{display:grid;grid-template-columns:72px minmax(0,1fr) 76px;gap:8px;align-items:center;width:100%;min-height:40px;border:0;border-top:1px dashed var(--line);background:none;color:var(--ink);font:700 14px "Noto Sans KR",sans-serif;cursor:pointer;padding:6px 0;text-align:left}
+.srow .sbar{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.srow .sbar i{display:block;height:100%;background:var(--el)}
+.srow .sv{text-align:right;white-space:nowrap}
+.rpm{margin-top:10px;font-size:14px;opacity:.85}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>내 사주 일간 × MBTI<br>조합은 뭘까?</h1>
+  <p class="lead">생일이랑 MBTI만 넣으면 끝.</p>
+
+  <div class="gban" id="gban" hidden></div>
+  <form class="panel" id="f">
+    <label class="t" for="bd">생년월일 (양력)</label>
+    <input type="date" id="bd" min="1920-01-01" max="2025-12-31" value="1990-05-15">
+    <label class="chk"><input type="checkbox" id="late"><span><b style="color:var(--ink)">밤 11시 30분 ~ 자정 사이에 태어났어요</b><br>사주의 하루는 자정이 아니라 밤 11시 30분에 시작돼요.<br>이 시간에 태어났는데 체크 안 하면 전혀 다른 결과가 나와요.</span></label>
+    <span class="t" style="display:block;font-weight:700;margin-bottom:8px">MBTI</span>
+    <div class="mb" id="mb"></div>
+    <button class="go" type="submit">결과 보기</button>
+    <p class="err" id="err" role="alert"></p>
+  </form>
+
+  <div id="load" aria-live="polite"><div class="orb" id="orb"></div><div id="lt"></div></div>
+
+  <section id="res" aria-live="polite">
+    <div class="peek" id="peek"><span id="peekT"></span><button type="button" id="bBack">내 결과로 돌아가기</button></div>
+    <div class="card" id="card">
+      <div class="tag"><span class="chip" id="cIl"></span><span class="chip" id="cMb"></span><span class="chip hot" id="cCh"></span></div>
+      <div class="nick" id="cNick"></div>
+      <p class="sum" id="cSum"></p>
+      <div class="box"><b>시너지·충돌 포인트</b><span id="cPt"></span></div>
+      <div class="box"><b>킹받는 포인트</b><span id="cAn"></span></div>
+      <div class="quote" id="cSh"></div>
+      <p class="rare" id="cRare"></p>
+      <div class="rx" id="cRx"></div>
+      <button class="spb" id="bSpicy" type="button" aria-pressed="false">매운맛 보기</button>
+    </div>
+    <div class="ft" id="ft"></div>
+    <div class="rxn" id="rxn"></div>
+    <button class="tz" id="tz" type="button" aria-label="찰떡·상극 TOP 3로 이동"></button>
+    <div class="acts">
+      <button id="bImg" type="button">공유 이미지</button>
+      <button id="bCopy" type="button">문구 복사</button>
+      <button id="bAgain" type="button">다시 하기</button>
+    </div>
+    <div id="imgwrap"><img id="shot" alt="공유용 결과 카드 이미지"><p>이미지를 길게 눌러(PC는 우클릭) 저장하세요</p></div>
+
+    <div class="sit">
+      <h2>상황별로 보면 이래요</h2>
+      <p id="sitLead"></p>
+      <div id="sitList"></div>
+    </div>
+
+    <div class="mt" id="mt">
+      <h2 id="mTitle">나랑 찰떡 vs 상극 조합</h2>
+      <p>사주 일간 궁합과 MBTI 궁합을 합쳐서 160개 조합 중에 골랐어요.</p>
+      <div class="zone"><h3><i>찰떡</i>잘 맞는 조합 TOP 3</h3>
+      <ol class="ml" id="mBest"></ol></div>
+      <div class="zone bad"><h3><i class="bad">상극</i>안 맞는 조합 TOP 3</h3>
+      <ol class="ml" id="mWorst"></ol></div>
+      <button class="ask" id="bAsk" type="button">친구한테 "너 무슨 조합이야?" 물어볼 문구 복사</button>
+      <details class="how"><summary>궁합은 이렇게 계산했어요</summary>
+        <p>사주: 천간합(갑기·을경·병신·정임·무계) +3, 서로 생해주는 오행 +2, 같은 오행 +1, 서로 극하는 오행 −2</p>
+        <p>MBTI: S/N이 같으면 +2, E/I가 반대면 +1, J/P가 반대면 +1</p>
+        <p>합계(−2~7점)를 궁합 30~98%로 바꿨고, TOP 3에는 같은 일간·같은 MBTI가 겹치지 않게 골랐어요.</p>
+      </details>
+    </div>
+    <div class="mt" id="sm">
+      <h2>썸 상대랑 궁합</h2>
+      <p>생일이나 MBTI 중 하나만 알아도 돼요. 모르는 건 '모름'으로 두면 가능한 경우를 다 계산해서 범위로 보여줘요.</p>
+      <div class="panel" style="margin-top:12px">
+        <label class="t" for="sBd">상대 생년월일 (양력)</label>
+        <input type="date" id="sBd" min="1920-01-01" max="2025-12-31">
+        <label class="chk" style="margin:10px 0 0"><input type="checkbox" id="sNo"><span>생일 모름</span></label>
+        <label class="chk" style="margin:6px 0 16px"><input type="checkbox" id="sLate"><span>밤 11시 30분 ~ 자정 사이에 태어났어요 (아는 경우만)</span></label>
+        <span class="t" style="display:block;font-weight:700;margin-bottom:8px">상대 MBTI (모르는 글자는 모름)</span>
+        <div class="sm3" id="sMb"></div>
+        <button class="go" type="button" id="sGo">궁합 보기</button>
+        <p class="err" id="sErr" role="alert"></p>
+      </div>
+      <div id="sOut"></div>
+    </div>
+    <div class="mt" id="rp">
+      <h2>심층 리포트 (준비 중)</h2>
+      <p>내 조합의 연애·일·돈 흐름을 10쪽으로 자세히 풀고, 썸 상대 궁합도 깊게 보는 리포트를 만들까 해요. 가격은 4,900원 정도로 생각 중이에요.</p>
+      <button class="ask" id="bReport" type="button">이런 거 나오면 볼래요</button>
+      <p class="rpm" id="rpMsg" hidden>의견 고마워요! 아직 만드는 중이라 지금은 결제나 연락처를 받지 않아요.</p>
+    </div>
+    <div class="mt" id="grp"></div>
+    <details class="how" id="memo"><summary>한 줄 남기기 (쓰고 싶은 사람만)</summary>
+      <textarea id="memoT" maxlength="200" rows="2" placeholder="예: 킹받는 포인트 완전 나임 ㅋㅋ"></textarea>
+      <button class="ask" id="memoB" type="button" style="margin-top:8px">남기기</button>
+    </details>
+  </section>
+
+  <details class="how adm" id="adm" hidden><summary>반응 집계 (주소 끝에 ?admin 붙였을 때만 보여요)</summary><div id="admL"></div></details>
+  <p class="note">시제품입니다. 일간은 양력 생년월일로 계산해요(태어난 시간은 자정 근처만 반영). 결과 문구는 재미용이에요.</p>
+</div>
+
+<script>
+{
+const COMBOS = [{"id":"gap_ISTJ","ilgan":"gap","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"철근 박힌 나무","summary":"한번 정하면 지구가 멸망해도 그대로 감","point":"갑목의 직진에 ISTJ의 계획표가 붙음 = 추진력+꼼꼼함 풀세트. 대신 \"원래 이렇게 하는 거야\"랑 \"내 말이 맞다니까?\"가 합쳐져서 설득 난이도 최상","annoying":"틀린 거 알아도 계획표대로 끝까지 감","share":"수정 요청은 받지 않습니다 (나무도 엑셀도)"}},{"id":"gap_ISFJ","ilgan":"gap","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"그늘 넓은 정자나무","summary":"앞에선 든든하게 끌고, 뒤에선 몰래 다 챙김","point":"갑목의 앞장섬 + ISFJ의 뒷수습 = 혼자서 반장이랑 총무 겸직. 근데 지적은 싫고 서운한 건 말 안 해서 속에 나이테처럼 쌓임","annoying":"\"내가 다 알아서 할게\" 하고 진짜 다 함. 그리고 혼자 지침","share":"다 챙겨줄게, 근데 내 방식으로"}},{"id":"gap_INFJ","ilgan":"gap","mbti":"INFJ","chem":"충돌","mild":{"nickname":"속 깊은 고목","summary":"겉은 대장, 속은 다 꿰뚫어 보는 예언자","point":"앞장서고 싶은 갑목 vs 선 긋는 INFJ. 내 사람한텐 그늘 끝없이 넓혀주는데, 선 넘으면 나무째 뽑아서 이사 감","annoying":"다 알고 있으면서 \"내 말이 맞다니까?\"를 차분하게 함","share":"뿌리까지 다 보고 있음. 그리고 내가 맞음"}},{"id":"gap_INTJ","ilgan":"gap","mbti":"INTJ","chem":"시너지","mild":{"nickname":"혼자 숲 설계 중","summary":"5년 로드맵 + 꺾이지 않는 직진 = 계획대로 다 됨","point":"갑목의 리더력에 INTJ의 설계력 장착 → 일은 기가 막히게 함. 근데 반장은 하고 싶은데 모임은 귀찮은 모순 보유","annoying":"단톡방 읽씹하다가 결론 내고 \"이대로 하자\" 선언","share":"이미 다 정했음. 회의는 형식임"}},{"id":"gap_ISTP","ilgan":"gap","mbti":"ISTP","chem":"충돌","mild":{"nickname":"말없이 버티는 통나무","summary":"대장 기질은 있는데 귀찮아서 반장은 안 함","point":"갑목의 직진 에너지 vs ISTP 절전 모드. 할 땐 확실하게, 안 할 땐 1mm도 안 움직임. 지적받으면 말싸움 대신 결과로 반박","annoying":"지적하면 대답 없이 혼자 고쳐놓고 \"됐지?\"","share":"말로 안 함. 결과로 이김"}},{"id":"gap_ISFP","ilgan":"gap","mbti":"ISFP","chem":"충돌","mild":{"nickname":"화분 속 큰 나무","summary":"꿈은 거목, 현실은 침대 위","point":"갑목 고집이 ISFP 감성이랑 만나서 '취향 고집'으로 진화. 남이 시키는 대로는 절대 안 하는데, 스스로 움직이는 것도 귀찮음","annoying":"\"내가 정할게!\" 해놓고 이불 속에서 정함","share":"앞장설 거임. 침대에서 일어나면"}},{"id":"gap_INFP","ilgan":"gap","mbti":"INFP","chem":"충돌","mild":{"nickname":"상상 속 숲의 왕","summary":"머릿속에선 이미 세계 정복, 현실은 시작 전","point":"지적 싫은 갑목 + 한마디에 상처받는 INFP = 피드백 방어력 2배. 대신 내 사람 지키려는 마음은 진짜 거목급","annoying":"조언 한마디 들으면 3일 동안 이불 속에서 반박문 씀","share":"꺾이진 않음. 대신 좀 시무룩함"}},{"id":"gap_INTP","ilgan":"gap","mbti":"INTP","chem":"충돌","mild":{"nickname":"\"근데 내가 맞잖아\" 나무","summary":"논리로 무장한 고집","point":"갑목의 고집에 INTP 분석력이 붙음 → 말싸움 무패. 근데 반장 기질 있으면서 연락은 잘 안 되는 미스터리","annoying":"\"내 말이 맞다니까?\"에 근거 자료 3개 첨부","share":"반박하려면 출처 가져오세요"}},{"id":"gap_ESTP","ilgan":"gap","mbti":"ESTP","chem":"시너지","mild":{"nickname":"브레이크 없는 나무","summary":"생각보다 몸이 먼저, 뒤도 안 돌아봄","point":"직진 × 실전 = 결정 0초. 꺾이느니 부러지는 타입이 \"될 것 같은데?\"까지 장착. 추진력 최상, 수습은 다음 회차","annoying":"길 막히면 돌아가는 대신 뚫고 감","share":"후진 기능 없음. 전진만 있음"}},{"id":"gap_ESFP","ilgan":"gap","mbti":"ESFP","chem":"시너지","mild":{"nickname":"축제 한가운데 큰 나무","summary":"모임 중심에 서는 게 숙명","point":"갑목의 앞장섬 + ESFP 분위기 메이커 = 타고난 무대 체질. 근데 계획 지적하는 순간 오늘 텐션 종료","annoying":"\"오늘은 내가 쏜다!\" 선언하고 다음 날 통장 보고 조용해짐","share":"주인공 자리는 원래 내 자리"}},{"id":"gap_ENFP","ilgan":"gap","mbti":"ENFP","chem":"시너지","mild":{"nickname":"가지 100개 뻗는 나무","summary":"아이디어 폭발 + 밀어붙이기 = 의외로 끝내는 ENFP","point":"갑목의 직진이 ENFP의 산만함을 붙잡아줌 → 시작한 거 진짜 끝냄(가끔). 대신 꽂힌 거 반대하면 고집+텐션 동시 폭발","annoying":"새 아이디어 낼 때마다 \"이번엔 진짜야\"라고 확신함","share":"이번 프로젝트는 끝까지 감 (진짜임, 이번 주 7번째)"}},{"id":"gap_ENTP","ilgan":"gap","mbti":"ENTP","chem":"충돌","mild":{"nickname":"토론장 한복판 고목","summary":"지는 법 모르는 사람 + 반박 장인 = 토론 무한 연장","point":"고집과 반박이 한 몸에 → 본인 안에서도 결론이 안 남. 근데 판 키우고 사람 끌어모으는 건 최강","annoying":"자기 의견에 자기가 반박하다가 결국 처음 의견으로 돌아옴","share":"나랑 싸워서 이긴 사람 없음 (나 포함)"}},{"id":"gap_ESTJ","ilgan":"gap","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"숲 관리소장","summary":"앞장 + 관리 = 조직 장악 3일 컷","point":"반장 기질 × 현실 관리자 → 일정·역할 분담·실행까지 원맨쇼. 대신 \"내 말이 맞다\"랑 \"9시 1분은 지각\"이 합쳐져 잔소리 파워 2배","annoying":"여행 일정표에 자유시간도 시간 정해놓음","share":"자유시간: 14:00~14:30 (엄수)"}},{"id":"gap_ESFJ","ilgan":"gap","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"마을 지키는 당산나무","summary":"모두를 품는 그늘, 근데 그늘 위치는 내가 정함","point":"남 챙기기 좋아하는 갑목 + 단톡방 살림꾼 = 모임의 엄마·아빠. 칭찬하면 무한 동력, 지적하면 무한 서운","annoying":"다 챙겨주고 \"고맙다는 말은?\" 조용히 기다림","share":"다 같이 행복하자. 내가 정한 방식으로"}},{"id":"gap_ENFJ","ilgan":"gap","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"모두의 버팀목","summary":"네 인생도 내가 앞장서서 끌어줌","point":"갑목 리더십 + ENFJ 코칭 = 사람 키우는 능력 최강. 근데 둘 다 '내가 맞다' 성향이라 본인 의사 묻기 전에 계획 확정","annoying":"고민 상담했더니 실행 계획서 받음 (마감일 포함)","share":"넌 할 수 있어. 안 되면 내가 끌고 감"}},{"id":"gap_ENTJ","ilgan":"gap","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"숲 전체를 접수한 나무","summary":"반장 아니고 회장. 아니 그냥 왕","point":"갑목의 앞장섬 × CEO 기질 = 리더 끝판왕. 추진력은 우주급인데 브레이크와 겸손이 동시에 결석","annoying":"친구 생일파티에도 목표 달성률 있음","share":"따라와. 질문은 도착해서 받음"}},{"id":"eul_ISTJ","ilgan":"eul","mbti":"ISTJ","chem":"충돌","mild":{"nickname":"울타리 따라 자라는 덩굴","summary":"유연한 척하는데 정해진 길로만 감","point":"을목 적응력 + ISTJ 규칙 = 상황 바뀌면 겉으로는 웃으며 맞춰주고, 속으로는 계획표 다시 짬","annoying":"\"응 그래 그렇게 하자~\" 해놓고 원래 계획대로 함","share":"유연하게 대처 중 (계획표 안에서)"}},{"id":"eul_ISFJ","ilgan":"eul","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"담장 감싸는 담쟁이","summary":"조용히 스며들어 모두를 챙기는 생존형 천사","point":"눈치 1등 + 기억력 만렙 = 필요한 거 말하기 전에 대령. 대신 거절 못 함 + 끝까지 버팀이라 과로해도 티가 안 남","annoying":"\"힘들어?\" 물으면 웃으면서 \"아니~\" (3년 치 저장 중)","share":"괜찮아요~ (메모장 저장 완료)"}},{"id":"eul_INFJ","ilgan":"eul","mbti":"INFJ","chem":"시너지","mild":{"nickname":"속을 감춘 덩굴","summary":"어디든 스며드는데 아무도 속은 모름","point":"눈치 + 통찰 = 사람 읽기 만렙. 웃으면서 맞춰주다가 선 넘으면 조용히 덩굴 걷어 감","annoying":"웃으면서 다 맞춰주다가 어느 날 조용히 사라짐","share":"적응 완료. 마음은 비공개"}},{"id":"eul_INTJ","ilgan":"eul","mbti":"INTJ","chem":"충돌","mild":{"nickname":"계산된 덩굴","summary":"적응하는 척하면서 전략적으로 뻗어 나감","point":"을목의 유연함이 INTJ 전략이랑 만나 '돌아가는 척 지름길' 완성. 모임 적응은 잘하는데 진심으로 혼자가 편함","annoying":"웃으면서 동의하고 결국 자기 계획대로 감 (3수 앞에서 이미 계산함)","share":"져주는 척하는 중입니다"}},{"id":"eul_ISTP","ilgan":"eul","mbti":"ISTP","chem":"시너지","mild":{"nickname":"어디서든 사는 야생 덩굴","summary":"적응력 만렙 + 손재주 = 무인도에서도 생존","point":"상황 맞춰 조용히 해결하는 콤비. 말없이 버티는 힘은 최강, 도움 요청은 최약","annoying":"힘든 일 있어도 \"ㅇㅇ 괜찮음\" 하고 혼자 다 해결해 옴","share":"알아서 살아남음. 걱정 ㄴㄴ"}},{"id":"eul_ISFP","ilgan":"eul","mbti":"ISFP","chem":"시너지","mild":{"nickname":"창가의 감성 덩굴","summary":"취향껏 자라는 중, 단 햇빛 좋은 곳에서만","point":"부드러움 × 부드러움 = 싸울 일 0. 근데 웃으며 맞춰주는 척 결국 자기 취향대로 감","annoying":"\"아무거나 괜찮아~\" 했는데 메뉴 3개 다 거절함","share":"아무거나 괜찮음 (아무거나는 안 됨)"}},{"id":"eul_INFP","ilgan":"eul","mbti":"INFP","chem":"시너지","mild":{"nickname":"비 맞고 크는 덩굴","summary":"한마디에 상처받고, 3일 뒤 더 크게 자람","point":"여린 INFP 마음에 을목 생존력 장착 → 회복탄력성이 의외로 높음. 상처도 거름으로 씀","annoying":"혼자 상상으로 서운했다가 혼자 화해하고 성장까지 끝냄","share":"상처 → 회복 → 성장 (상대는 모름)"}},{"id":"eul_INTP","ilgan":"eul","mbti":"INTP","chem":"충돌","mild":{"nickname":"연구실 화분 덩굴","summary":"눈치는 빠른데 대답은 분석으로 함","point":"을목 사회성 vs INTP 연락 두절. 분위기는 다 읽었는데 반응이 논리적이라 분위기를 다시 깸","annoying":"분위기 다 파악해 놓고 \"근데 그건 논리적으로…\"","share":"눈치는 챘음. 동의는 안 함"}},{"id":"eul_ESTP","ilgan":"eul","mbti":"ESTP","chem":"시너지","mild":{"nickname":"쑥쑥 뻗는 정글 덩굴","summary":"어디 던져놔도 3분 만에 적응하고 놀고 있음","point":"적응력 × 즉흥력 = 실전 생존왕. 낯선 환경이나 위기도 그냥 놀이터","annoying":"길 잃었는데 현지인이랑 친구 돼서 밥 얻어먹고 옴","share":"어디 떨어뜨려도 살아서 돌아옴"}},{"id":"eul_ESFP","ilgan":"eul","mbti":"ESFP","chem":"시너지","mild":{"nickname":"파티장 장식 덩굴","summary":"어느 모임이든 3분 컷 인싸","point":"분위기 맞추기 + 분위기 띄우기 = 인싸력 2배. 질긴 생존력은 노는 체력으로 씀","annoying":"\"딱 한 잔만\" 하고 새벽 4시까지 버팀","share":"체력은 덩굴급, 막차는 안중에 없음"}},{"id":"eul_ENFP","ilgan":"eul","mbti":"ENFP","chem":"시너지","mild":{"nickname":"사방으로 뻗는 덩굴","summary":"아는 사람 수 = 덩굴 길이","point":"적응력 + 친화력 → 인맥 무한 확장. 대신 웃으면서 결국 하고 싶은 거 함 + 아이디어 폭발이라 주변이 정신없음","annoying":"모임 5개 동시 참석 중, 다 진심임","share":"친구의 친구의 친구도 내 친구"}},{"id":"eul_ENTP","ilgan":"eul","mbti":"ENTP","chem":"충돌","mild":{"nickname":"능청 덩굴","summary":"웃으면서 반박하는 고수","point":"을목의 부드러움 속에 ENTP 반박이 숨어 있음 → 상대는 공격당한 줄도 모르고 설득당함","annoying":"\"맞아맞아~ 근데\"로 시작해서 정반대 결론 냄","share":"맞아맞아~ (근데)"}},{"id":"eul_ESTJ","ilgan":"eul","mbti":"ESTJ","chem":"충돌","mild":{"nickname":"철제 구조물 감은 덩굴","summary":"유연한 관리자. 근데 결국 내 뜻대로","point":"돌아가는 을목 vs 정면 돌파 ESTJ. 겉으로는 부드럽게 부탁, 속으로는 일정표 엄수","annoying":"웃으면서 잔소리함. 그래서 반박을 못 함","share":"부드럽게 말할 때 하세요 ^^"}},{"id":"eul_ESFJ","ilgan":"eul","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"단톡방 덩굴 네트워크","summary":"모든 단톡방에 스며들어 있음","point":"눈치 1등 + 살림꾼 = 분위기 수습 최강. 대신 서운함도 덩굴처럼 은근히 길게 감","annoying":"다 맞춰주다가 \"나도 서운할 줄 알아\" 한 번 터짐","share":"다 맞춰줌. 근데 기억은 함"}},{"id":"eul_ENFJ","ilgan":"eul","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"사람 이어주는 덩굴","summary":"아는 사람끼리 다 연결해 주는 인간 허브","point":"적응력 + 사람 모으는 재능 → 소개·모임 주선 1등. 웃으면서 결국 원하는 방향으로 사람들을 끌고 감","annoying":"\"너네 둘 잘 맞을 것 같아\" 해놓고 이미 약속 잡아둠","share":"자연스럽게 엮는 중 (계획됨)"}},{"id":"eul_ENTJ","ilgan":"eul","mbti":"ENTJ","chem":"충돌","mild":{"nickname":"벽 타고 정상까지 가는 덩굴","summary":"부드러운 얼굴의 야망가","point":"을목은 돌아가고 ENTJ는 정면으로 감 → 웃으며 우회하다가 결국 정상 점령. 적이 안 생기는 정복자","annoying":"아무도 눈치 못 챘는데 어느새 팀장 돼 있음","share":"천천히, 웃으면서, 정상까지"}},{"id":"byeong_ISTJ","ilgan":"byeong","mbti":"ISTJ","chem":"충돌","mild":{"nickname":"알람 맞춰 뜨는 태양","summary":"열정은 넘치는데 일정표 안에서만","point":"즉흥 텐션 병화 vs 계획 ISTJ → 텐션도 시간 정해서 올림. 표정 관리가 안 돼서 일정 바뀌면 멘붕이 얼굴에 생중계","annoying":"약속 바뀌면 \"괜찮아!\" 하는데 얼굴은 안 괜찮음","share":"텐션 업 예정 시각: 19:00"}},{"id":"byeong_ISFJ","ilgan":"byeong","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"따뜻한 오후 햇살","summary":"밝게 웃으면서 다 챙겨줌","point":"리액션 + 챙김 = 모두가 좋아하는 사람. 오지랖이 기억력이랑 만나 남의 일까지 다 기억함. 거절 못 해서 햇빛처럼 다 나눠줌","annoying":"남 고민 해결해 주느라 내 할 일은 내일로","share":"다 비춰주느라 정작 나는 그늘"}},{"id":"byeong_INFJ","ilgan":"byeong","mbti":"INFJ","chem":"충돌","mild":{"nickname":"구름 뒤의 태양","summary":"속은 안 보여주려는데… 표정에 다 보임","point":"숨기는 기능 없는 병화 vs 마음 비공개 INFJ = 숨기려는데 얼굴이 다 말해버림","annoying":"\"나 괜찮아\" 하는데 표정이 실시간 중계","share":"비공개 설정함 (표정은 공개)"}},{"id":"byeong_INTJ","ilgan":"byeong","mbti":"INTJ","chem":"충돌","mild":{"nickname":"계획 세우는 태양","summary":"열정과 계산이 동시에 돌아감","point":"병화 텐션 + INTJ 효율 → 화끈하게 하는데 비효율은 못 참음. 혼자가 편하다면서 리액션은 장인급","annoying":"혼자 있고 싶다더니 모임 가서 제일 크게 웃음","share":"혼자가 편함 (근데 나가면 텐션 MAX)"}},{"id":"byeong_ISTP","ilgan":"byeong","mbti":"ISTP","chem":"충돌","mild":{"nickname":"절전 모드 태양","summary":"켜지면 눈부시고, 꺼지면 ㅇㅇ","point":"병화 텐션 vs ISTP 귀찮음 → 온오프가 극단적. 뒤끝 없음 × 침착함이라 싸움 자체가 안 됨","annoying":"신났을 땐 말 100마디, 아니면 \"ㅇㅇ\"","share":"on/off만 있음. 밝기 조절 없음"}},{"id":"byeong_ISFP","ilgan":"byeong","mbti":"ISFP","chem":"시너지","mild":{"nickname":"노을빛 태양","summary":"감성 충만한 따뜻함, 체력은 반나절","point":"밝음 + 감성 = 같이 있으면 분위기 좋음. 근데 텐션 확 올랐다가 바로 침대행","annoying":"\"오늘 완전 신나!\" 2시간 뒤 \"집 가고 싶다…\"","share":"광합성 끝, 충전하러 갑니다"}},{"id":"byeong_INFP","ilgan":"byeong","mbti":"INFP","chem":"시너지","mild":{"nickname":"마음 녹이는 햇볕","summary":"남 일에 같이 울고 같이 웃는 공감 태양","point":"공감 + 리액션 = 위로 최강. 근데 화는 5분이면 까먹는데 상상 속 서운함은 3일 감","annoying":"같이 울어주다가 본인이 더 많이 욺","share":"니 얘기 듣다가 내가 더 울었음"}},{"id":"byeong_INTP","ilgan":"byeong","mbti":"INTP","chem":"충돌","mild":{"nickname":"실험실의 태양","summary":"궁금한 거 생기면 열정 폭발","point":"병화 열정이 INTP 탐구로 쏠림 → 꽂히면 불태움. 표정은 다 드러나는데 말은 논리적이라 온도 차 있음","annoying":"위로해 달랬더니 열정적으로 원인 분석해 줌","share":"열정적으로 분석해 드립니다"}},{"id":"byeong_ESTP","ilgan":"byeong","mbti":"ESTP","chem":"시너지","mild":{"nickname":"한여름 정오의 태양","summary":"가만히 있는 법을 모름","point":"텐션 × 실전 = 일단 출발. 뒤끝 없고 지루한 거 못 참음. 같이 다니는 사람 체력 방전 주의","annoying":"\"지금 바다 갈 사람?\" (밤 11시)","share":"지금 출발함. 이유는 가면서 생각함"}},{"id":"byeong_ESFP","ilgan":"byeong","mbti":"ESFP","chem":"시너지","mild":{"nickname":"무대 체질 태양","summary":"존재 자체가 축제","point":"리액션 장인 + 사진 담당 = 모든 순간이 하이라이트. 오늘이 통장보다 우선이라 텐션도 지갑도 활짝","annoying":"오늘 기분 좋다고 다 쏨","share":"오늘의 주인공 = 나, 계산도 나"}},{"id":"byeong_ENFP","ilgan":"byeong","mbti":"ENFP","chem":"시너지","mild":{"nickname":"텐션 무한 태양","summary":"텐션×텐션 = 주변 사람 귀 아픔 주의","point":"오지랖 200% + 아이디어 폭발 → 남의 일까지 계획 세워줌. 뒤끝도 없고 우울 모드도 5분이면 끝","annoying":"남의 고민에 새 프로젝트 3개 제안함","share":"꺼지는 스위치 없음 (찾지 마세요)"}},{"id":"byeong_ENTP","ilgan":"byeong","mbti":"ENTP","chem":"시너지","mild":{"nickname":"말빨 태양","summary":"뜨겁게 반박하고 5분 뒤 다 까먹음","point":"표정에 다 보이는 반박이라 장난인지 진심인지 다 드러남. 뒤끝이 없어서 싸우고 5분 뒤 같이 웃음","annoying":"열띠게 반박해 놓고 5분 뒤 \"배고프다 밥 먹자\"","share":"토론은 뜨겁게, 뒤끝은 0"}},{"id":"byeong_ESTJ","ilgan":"byeong","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"출근하는 태양","summary":"열정적인 현장 반장","point":"텐션 + 관리력 = 팀 끌고 가는 힘 최강. 오지랖 + 잔소리라 남의 팀 일까지 관리함","annoying":"남의 팀 일정까지 챙기고 있음","share":"다들 힘내자! (9시 집합)"}},{"id":"byeong_ESFJ","ilgan":"byeong","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"모두를 비추는 태양","summary":"단톡방 텐션 담당 겸 살림꾼","point":"오지랖 + 챙김 = 동네 반장급. 대신 읽씹당하면 표정까지 시무룩","annoying":"답장 늦으면 \"무슨 일 있어?\" 5통","share":"다들 밥 먹었어?? 사진 보내봐!!"}},{"id":"byeong_ENFJ","ilgan":"byeong","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"응원단장 태양","summary":"네 잠재력, 내가 큰 소리로 믿어줌","point":"텐션 + 코칭 = 동기부여 끝판왕. 오지랖이 인생 코칭으로 진화함","annoying":"\"넌 할 수 있어!!\" 3번째 외치는 중 (부탁 안 함)","share":"응원 중!! (거절 불가)"}},{"id":"byeong_ENTJ","ilgan":"byeong","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"정복하는 태양","summary":"열정으로 밀고, 결과로 증명함","point":"텐션 × 추진력 = 시작부터 끝까지 풀파워. 무능 못 참는데 표정 관리가 안 돼서 답답하면 얼굴에 다 나옴","annoying":"회의 중 답답한 표정 숨기기 실패","share":"해 뜨면 일 시작. 해는 안 짐"}},{"id":"jeong_ISTJ","ilgan":"jeong","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"정시 점등 촛불","summary":"조용히, 꾸준히, 끝까지 타는 사람","point":"정화의 몰입력에 ISTJ 성실함이 붙어서, 맡은 일은 밤을 새서라도 끝냄. 근데 서운한 건 말 안 하고 규칙 어긴 건 기억해서 조용히 장부를 쓰는 중","annoying":"\"괜찮아\" 해놓고 늦은 시간을 분 단위까지 기억함","share":"늦어도 괜찮아 (7분 늦었음)"}},{"id":"jeong_ISFJ","ilgan":"jeong","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"난롯가 촛불","summary":"티 안 나게 데워주는 사람","point":"친한 사람한테만 나오는 찐 따뜻함에 티 안 나게 챙기는 성격까지 = 받는 사람만 아는 감동. 근데 작은 말도 오래 기억하고 메모장에도 저장해서 서운함 보관함이 2배","annoying":"\"아니 괜찮아~\" 하고 5년 전 일을 날짜까지 말함","share":"다 기억함. 따뜻한 것도, 서운한 것도"}},{"id":"jeong_INFJ","ilgan":"jeong","mbti":"INFJ","chem":"시너지","mild":{"nickname":"등대 속 촛불","summary":"다 꿰뚫어 보는데 불은 몇 명한테만 켜줌","point":"겉은 잔잔하고 속마음은 비공개라 미스터리 끝판왕. 선 안에 들어온 사람한텐 평생 불 켜주고, 선 넘으면 조용히 끔","annoying":"\"괜찮아\" 하고 그날 밤 조용히 차단","share":"불은 꺼졌습니다. 경고는 없었습니다"}},{"id":"jeong_INTJ","ilgan":"jeong","mbti":"INTJ","chem":"충돌","mild":{"nickname":"실험실 알코올램프","summary":"겉은 차가운 전략가, 속은 활활","point":"효율 따지는 INTJ인데 꽂히면 정화 몰입이 발동해서 비효율적으로 밤샘. 관심 없는 건 1도 관심 없는데 내 사람 일은 몰래 다 계산해 둠","annoying":"\"관심 없어\" 해놓고 새벽 3시까지 그거 파고 있음","share":"관심 없음 (새벽 3시, 아직 보는 중)"}},{"id":"jeong_ISTP","ilgan":"jeong","mbti":"ISTP","chem":"충돌","mild":{"nickname":"라이터 불","summary":"필요할 때만 딱 켜짐","point":"ISTP는 진짜 안 화나는데 정화의 \"괜찮아\"는 안 괜찮음 → 본인도 지금 화난 건지 헷갈림. 대신 꽂히면 밤새 손으로 뭘 만들고 있음","annoying":"\"화났어?\" \"아니\" (반반임)","share":"켜질 땐 켜짐. 언제인지는 나도 모름"}},{"id":"jeong_ISFP","ilgan":"jeong","mbti":"ISFP","chem":"시너지","mild":{"nickname":"방 안의 향초","summary":"감성 풀충전, 조명은 무드등","point":"잔잔한 감성에 확실한 취향까지 = 방 분위기·플레이리스트 장인. 맞춰주는 척하면서 마음속에 서운함 하나 조용히 켜둠","annoying":"약속 귀찮다더니 막상 만나면 제일 늦게까지 있다 감","share":"무드등 켜놓고 침대랑 한 몸 되는 중"}},{"id":"jeong_INFP","ilgan":"jeong","mbti":"INFP","chem":"시너지","mild":{"nickname":"일기장 옆 촛불","summary":"밤마다 감성 장편소설 연재 중","point":"새벽 감성에 상상력까지 = 감수성 끝판왕. 작은 말 오래 기억하는데 혼자 상상으로도 서운해해서, 상대는 기억도 못 하는 일로 시즌 3까지 감","annoying":"3년 전 그 말 아직도 곱씹는 중","share":"그때 그 말, 아직 타고 있음"}},{"id":"jeong_INTP","ilgan":"jeong","mbti":"INTP","chem":"충돌","mild":{"nickname":"연구실 분젠버너","summary":"꽂히면 밤새는데 감정은 분석 중","point":"몰입러에 파고드는 INTP까지 = 한 분야 박사 예약. 근데 속은 뜨거운데 말은 논리라서 \"괜찮아\"도 논리적으로 함","annoying":"서운한 이유를 3가지로 정리해서 말함","share":"서운함 (근거 3개 첨부)"}},{"id":"jeong_ESTP","ilgan":"jeong","mbti":"ESTP","chem":"충돌","mild":{"nickname":"불꽃놀이 심지","summary":"조용한 줄 알았는데 불붙으면 펑","point":"잔잔한 정화 vs 즉흥 ESTP → 평소엔 조용하다가 재밌는 거 보이면 바로 점화. 근데 작은 말을 오래 기억해서 장난친 사람 다 기억함","annoying":"웃으면서 같이 놀아놓고 그때 한 말 나중에 꺼냄","share":"불붙으면 못 끔. 취급 주의"}},{"id":"jeong_ESFP","ilgan":"jeong","mbti":"ESFP","chem":"충돌","mild":{"nickname":"캠프파이어","summary":"모임에선 분위기 메이커, 집에선 혼자 곱씹기","point":"겉은 ESFP 텐션인데 속은 정화라서 집 가는 길에 오늘 대화 리플레이 시작. 친한 사람한텐 찐으로 따뜻함","annoying":"제일 신나게 놀고 집 가서 \"나 말실수했나?\"","share":"파티 끝, 지금부터 혼자 회고 시간"}},{"id":"jeong_ENFP","ilgan":"jeong","mbti":"ENFP","chem":"시너지","mild":{"nickname":"밤에 더 빛나는 반딧불이","summary":"여기저기 반짝, 근데 밤에 제일 반짝","point":"아이디어 폭발에 밤새는 몰입이 붙어서 드디어 끝까지 하는 ENFP. 대신 신났다 우울했다 + \"괜찮아\"(안 괜찮음) 콤보로 감정 롤러코스터","annoying":"\"나 괜찮아!!\" (느낌표 많을수록 안 괜찮음)","share":"괜찮아!!! (느낌표 개수 확인 바람)"}},{"id":"jeong_ENTP","ilgan":"jeong","mbti":"ENTP","chem":"충돌","mild":{"nickname":"장난으로 그은 성냥","summary":"장난으로 긁었는데 불붙음","point":"장난과 진심 경계 없는 ENTP + 작은 말 오래 기억하는 정화 = 내가 한 장난은 까먹고 남이 한 장난은 기억함","annoying":"반박해 놓고 상대 반박은 3달 동안 기억함","share":"토론은 끝났지만 기록은 남음"}},{"id":"jeong_ESTJ","ilgan":"jeong","mbti":"ESTJ","chem":"충돌","mild":{"nickname":"꺼지지 않는 비상구 등","summary":"책임감은 활활, 서운함은 속에서 활활","point":"ESTJ 관리력에 정화 몰입까지 = 맡으면 밤새서 끝냄. 근데 잔소리는 하면서 서운한 건 말을 안 해서 잔소리에 서운함이 섞여 나옴","annoying":"\"괜찮아, 근데 다음부턴 9시까지 와\"","share":"괜찮음. 다음부터 지켜주세요"}},{"id":"jeong_ESFJ","ilgan":"jeong","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"식탁 위 촛불","summary":"모두를 데우는데 서운함도 오래 탐","point":"단톡방 살림꾼에 찐 따뜻함까지 = 생일마다 손편지 쓰는 사람. 근데 읽씹에 민감하고 작은 말도 기억해서 서운함이 오래 타오름","annoying":"읽씹 한 번에 \"괜찮아\" 하고 3일 동안 이모티콘 줄어듦","share":"괜찮아 (이모티콘 0개)"}},{"id":"jeong_ENFJ","ilgan":"jeong","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"길 밝히는 등불","summary":"네 앞길을 조용히, 끝까지 비춰줌","point":"코칭 본능에 꺼지지 않는 정성까지 = 한번 챙기기로 한 사람은 끝까지 챙김. 남 챙기다 방전되는데 \"괜찮아\"로 버팀","annoying":"본인 방전 직전인데 \"넌 괜찮아?\" 물어봄","share":"너 먼저 밝혀줄게. 나는 괜찮아 (안 괜찮음)"}},{"id":"jeong_ENTJ","ilgan":"jeong","mbti":"ENTJ","chem":"충돌","mild":{"nickname":"조용한 용광로","summary":"겉은 CEO, 속은 활활 타는 야망","point":"ENTJ 추진력에 정화 몰입이 붙어서 목표에 불붙으면 끝장 봄. 근데 무능 못 참고 작은 말도 오래 기억해서 남의 실수가 회의록처럼 저장됨","annoying":"\"괜찮아, 다음엔 잘하자\" (회의록 저장 완료)","share":"조용히 타오르는 중. 목표 달성할 때까지"}},{"id":"mu_ISTJ","ilgan":"mu","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"등산로 정비된 산","summary":"흔들림 0, 일정 변경도 0","point":"안정감에 규칙까지 = 믿고 맡기는 사람 1순위. 근데 원래도 느린데 일정 바뀌면 더 안 움직임","annoying":"급한 일 말해도 \"원래 순서대로 하자\"","share":"산은 원래 자리에 있음. 일정도"}},{"id":"mu_ISFJ","ilgan":"mu","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"마을 뒷산","summary":"말없이 다 품어주는 동네 어른","point":"고민상담소 사장님에 기억력 좋은 수호천사까지 = 네 고민 3년 치 다 기억하고 다 들어줌. 대신 본인 고민은 산속에 묻어둠","annoying":"다 들어주고 본인 얘기는 \"난 괜찮아\"","share":"다 들어줌. 내 얘긴 산에 묻어둠"}},{"id":"mu_INFJ","ilgan":"mu","mbti":"INFJ","chem":"시너지","mild":{"nickname":"안개 낀 산","summary":"다 품어주는데 정상은 안 보여줌","point":"안 흔들리는 무토에 선 확실한 INFJ = 위기 때 제일 믿음직한데 속마음은 구름 속. 선 넘으면 산사태 대신 조용히 입산 금지","annoying":"다 들어주다가 어느 날 입산 금지 팻말 세움","share":"등산로 폐쇄. 사유는 비공개"}},{"id":"mu_INTJ","ilgan":"mu","mbti":"INTJ","chem":"시너지","mild":{"nickname":"요새가 된 산","summary":"안 움직이는데 머릿속은 5년 앞","point":"묵직함에 전략까지 = 흔들림 없는 장기 플랜. 느린 게 아니라 이미 계산 끝내고 기다리는 중. 근데 느린 답장에 읽씹까지 겹쳐서 연락은 거의 두절급","annoying":"일주일 만에 답장 와서 결론만 한 줄","share":"답장 늦은 거 아님. 계산 중이었음"}},{"id":"mu_ISTP","ilgan":"mu","mbti":"ISTP","chem":"시너지","mild":{"nickname":"말없는 바위산","summary":"말도 움직임도 없는데 필요할 땐 다 해결","point":"침착 × 침착 = 위기 상황 최강 멘탈. 대신 느린 답장에 \"ㅇㅇ\"까지 붙어서 연락은 봉화 수준","annoying":"3시간 뒤 답장: \"ㅇ\"","share":"ㅇ (3시간 고민한 답장)"}},{"id":"mu_ISFP","ilgan":"mu","mbti":"ISFP","chem":"시너지","mild":{"nickname":"이불 덮은 산","summary":"움직이기 싫은 마음 2배","point":"느긋함에 침대 사랑까지 = 집 밖으로 꺼내려면 지진급 에너지 필요. 대신 옆에 있으면 편안함 최강","annoying":"\"나가자\" 해놓고 3시간째 누워서 준비 중","share":"산은 원래 안 움직임. 나도"}},{"id":"mu_INFP","ilgan":"mu","mbti":"INFP","chem":"시너지","mild":{"nickname":"구름 품은 산","summary":"겉은 묵직, 속은 장편소설","point":"INFP의 여린 마음을 무토가 단단하게 받쳐줌 → 상처받아도 겉으론 안 흔들림. 대신 속에서 3일째 회복 중인 건 아무도 모름","annoying":"상처받았는데 표정 변화 0이라 아무도 모름","share":"멀쩡해 보이지? 속은 장마철"}},{"id":"mu_INTP","ilgan":"mu","mbti":"INTP","chem":"충돌","mild":{"nickname":"지질 연구 중인 산","summary":"꿈쩍도 안 하는데 머릿속은 새벽 4시","point":"느긋한 무토 + 연락 잘 안 되는 INTP = 연락 두절 2배. 고민 들어주는 건 좋은데 듣다 보면 분석이 시작됨","annoying":"고민 다 들어주고 \"근데 원인부터 정리해 보자\"","share":"듣고 있음. 분석도 하고 있음"}},{"id":"mu_ESTP","ilgan":"mu","mbti":"ESTP","chem":"충돌","mild":{"nickname":"휴화산","summary":"평소엔 산, 터지면 화산","point":"느긋한 무토 vs 즉흥 ESTP → 몇 달 꿈쩍 안 하다가 꽂히면 한 번에 분출. 위기 때 침착함 + 즉흥 대처 = 사고 수습 전문","annoying":"몇 달 조용하다가 갑자기 \"내일 제주도 가자\"","share":"움직이면 지진 (진짜임)"}},{"id":"mu_ESFP","ilgan":"mu","mbti":"ESFP","chem":"충돌","mild":{"nickname":"축제 열리는 산","summary":"판 깔아주는 묵직한 인싸","point":"ESFP 텐션을 무토가 받쳐줘서 놀 때도 안정감 있음. 근데 '오늘 기분이 우선'이랑 느긋함이 섞여서 \"오늘 놀자\"가 3주 뒤에 성사","annoying":"\"다음에 놀자!\" 진짜 다음 계절에 놂","share":"축제 예정 (날짜 미정)"}},{"id":"mu_ENFP","ilgan":"mu","mbti":"ENFP","chem":"충돌","mild":{"nickname":"산 위의 놀이공원","summary":"아이디어는 산더미, 실행은 산처럼 느림","point":"ENFP 아이디어 폭발 × 무토 느긋함 = 기획서는 100개, 착공은 0개. 대신 사람을 다 품어서 친구는 산만큼 많음","annoying":"\"대박 아이디어 있어\" 하고 3년째 숙성 중","share":"숙성 중인 아이디어 87개"}},{"id":"mu_ENTP","ilgan":"mu","mbti":"ENTP","chem":"충돌","mild":{"nickname":"토론하는 산","summary":"꿈쩍도 안 하고 반박함","point":"ENTP 반박을 무토가 느긋하게 하니까 상대가 먼저 지침. 흔들림 없는 멘탈이라 말싸움 무패","annoying":"반박해 놓고 상대가 화내면 \"왜 그렇게 흥분해?\"","share":"난 안 흔들림. 너만 흔들림"}},{"id":"mu_ESTJ","ilgan":"mu","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"관리사무소 있는 산","summary":"묵직한 책임감, 맡으면 끝까지","point":"안정감에 관리력까지 = 조직의 기둥. 느린 무토가 ESTJ 엔진 달고 속도까지 붙음. 대신 한번 정한 건 산 옮기기보다 바꾸기 어려움","annoying":"규칙 바꾸자고 하면 \"그동안 잘해왔잖아\"","share":"이 조직은 내가 받치고 있음"}},{"id":"mu_ESFJ","ilgan":"mu","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"모두가 쉬어가는 산","summary":"다 품어주는 동네 맏형·맏언니","point":"고민상담소에 단톡방 살림꾼까지 = 모든 사람의 고민 창구. 근데 답장이 느려서 \"나 뭐 잘못했나?\" 걱정을 본인이 만들어냄","annoying":"남의 고민엔 즉답, 본인 답장은 반나절","share":"다들 힘들면 산으로 와"}},{"id":"mu_ENFJ","ilgan":"mu","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"모두를 품는 큰 산","summary":"네 인생 계획, 내가 든든하게 받쳐줌","point":"품어주는 무토 + 코칭하는 ENFJ = 인생 멘토 체질. 계획은 세워주는데 재촉은 느긋해서 부담은 덜함","annoying":"고민 1개 말했더니 1시간 인생 상담 받음","share":"넌 할 수 있어. 천천히 해도 돼"}},{"id":"mu_ENTJ","ilgan":"mu","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"제국을 품은 산","summary":"묵직하게, 하지만 확실하게 정복","point":"ENTJ 야망에 무토 안정감까지 = 서두르지 않는 정복자. 움직이는 데 오래 걸려도 한번 움직이면 판이 바뀜","annoying":"느긋해 보이는데 이미 다 장악해 놓음","share":"움직이면 지진. 이미 움직였음"}},{"id":"gi_ISTJ","ilgan":"gi","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"가계부 쓰는 텃밭","summary":"한 평도 낭비 없는 알뜰 관리자","point":"기토의 실속 + ISTJ 꼼꼼함 = 돈·일정·물건 관리 완벽. 근데 걱정 많은 기토에 변수 싫은 ISTJ라 '혹시 몰라' 대비책이 플랜 C까지 있음","annoying":"여행 가방에 '혹시 몰라' 파우치만 3개","share":"만약을 대비했음 (만약이 87개)"}},{"id":"gi_ISFJ","ilgan":"gi","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"모두 먹여 살리는 밭","summary":"말 안 해도 반찬 싸 보내는 사람","point":"남 챙기는 기토 + 다 기억하는 ISFJ = 생일·못 먹는 음식·취향 다 저장된 사람. 대신 거절 못 하고 속으로만 걱정해서 혼자 밭갈이 중","annoying":"\"밥은 먹었어?\"를 하루 세 번 물어봄","share":"밥은 먹고 다니냐 (진심임)"}},{"id":"gi_INFJ","ilgan":"gi","mbti":"INFJ","chem":"시너지","mild":{"nickname":"비밀의 정원","summary":"다 품어주는데 입구는 안 알려줌","point":"기토의 포용력 + INFJ 통찰 = 상담받으러 왔다가 인생 정리하고 감. 근데 생각 많음 × 생각 많음이라 머릿속 밭에 고민이 무성","annoying":"남 고민 들어주고 집 가서 그 사람 걱정으로 밤샘","share":"네 고민 내가 대신 하는 중"}},{"id":"gi_INTJ","ilgan":"gi","mbti":"INTJ","chem":"충돌","mild":{"nickname":"설계도 있는 농장","summary":"느긋해 보이는데 수확 계획 이미 5년 치","point":"품어주는 기토 vs 효율 따지는 INTJ → 사람은 챙기는데 비효율은 못 봄. 속으로 계산 끝내놓고 겉으로는 \"음~ 그럴 수도 있지\"","annoying":"\"그럴 수도 있지~\" 해놓고 속으로 대안 3개 준비 완료","share":"그럴 수도 있지 (아님)"}},{"id":"gi_ISTP","ilgan":"gi","mbti":"ISTP","chem":"충돌","mild":{"nickname":"자갈 섞인 흙","summary":"챙기는 듯 무심한 듯","point":"걱정 많은 기토 vs 귀찮은 ISTP → 머릿속은 걱정 풀가동인데 행동은 절전 모드. 대신 실속은 확실해서 필요한 것만 딱 챙김","annoying":"걱정된다면서 연락은 3일에 한 번 \"ㅇㅇ 잘 지냄?\"","share":"걱정은 하고 있음 (표현은 안 함)"}},{"id":"gi_ISFP","ilgan":"gi","mbti":"ISFP","chem":"시너지","mild":{"nickname":"작은 꽃밭","summary":"취향 확실한 홈가드닝러","point":"부드러운 기토 + 감성 ISFP = 같이 있으면 편안함 최강. 근데 둘 다 상대 먼저 배려하는 타입이라 메뉴 고르다 점심시간 끝남","annoying":"\"너 먹고 싶은 거 먹자\" 무한 반복","share":"아무거나 괜찮아 진짜로 (메뉴판 30분째)"}},{"id":"gi_INFP","ilgan":"gi","mbti":"INFP","chem":"시너지","mild":{"nickname":"물안개 낀 정원","summary":"상상 속에서 이미 다 키워놓음","point":"기토의 걱정 + INFP의 상상 = 일어나지도 않은 일로 시즌제 드라마 제작. 대신 공감력은 둘이 합쳐 만렙","annoying":"답장 하나 늦으면 최악의 시나리오 5편 완성","share":"아직 아무 일도 안 일어남 (머릿속은 완결)"}},{"id":"gi_INTP","ilgan":"gi","mbti":"INTP","chem":"충돌","mild":{"nickname":"실험용 토양","summary":"생각은 많은데 그 생각이 분석임","point":"걱정 많은 기토 + 파고드는 INTP = 걱정을 논리적으로 함. 남 챙기는 마음은 있는데 표현이 리포트 형식","annoying":"위로 대신 \"확률적으로 그럴 일은 낮아\"","share":"걱정 마. 확률 3%임"}},{"id":"gi_ESTP","ilgan":"gi","mbti":"ESTP","chem":"충돌","mild":{"nickname":"공사장 흙","summary":"조심성 + 즉흥 = 계산된 즉흥","point":"신중한 기토 vs 일단 하는 ESTP → 몸은 먼저 나가는데 머릿속에선 리스크 계산 중. 결국 실속은 챙기는 즉흥러","annoying":"\"가자!\" 해놓고 출발 전 가성비 검색 20분","share":"즉흥 여행 (가성비 검증 완료)"}},{"id":"gi_ESFP","ilgan":"gi","mbti":"ESFP","chem":"시너지","mild":{"nickname":"축제장 잔디밭","summary":"모두가 편하게 노는 판을 깔아줌","point":"포용하는 기토 + 분위기 메이커 ESFP = 다 같이 노는 자리 만드는 사람. 근데 놀면서도 '다들 재밌나?' 눈치 보는 중","annoying":"제일 신나 보이는데 속으로 인원 체크 중","share":"다들 재밌지?? (진짜인지 확인 중)"}},{"id":"gi_ENFP","ilgan":"gi","mbti":"ENFP","chem":"시너지","mild":{"nickname":"뭐든 심어보는 밭","summary":"아이디어 씨앗 100개, 일단 다 심음","point":"다 받아주는 기토가 ENFP 아이디어를 품어줌 → 시작은 많은데 기토 덕에 몇 개는 진짜 수확함. 대신 걱정과 설렘이 동시에 폭발","annoying":"\"이거 대박일 듯!\" 하고 다음 날 \"근데 망하면 어떡하지…\"","share":"설렘 50 걱정 50"}},{"id":"gi_ENTP","ilgan":"gi","mbti":"ENTP","chem":"충돌","mild":{"nickname":"갈아엎은 밭","summary":"포용하는 척 반박 장전","point":"둥글게 넘어가려는 기토 vs 반박하고 싶은 ENTP → \"그럴 수도 있지\"와 \"근데\"가 한 문장에 공존","annoying":"\"맞아 그럴 수 있어~ 근데 반대로 보면\"","share":"다 이해함. 근데 반박도 함"}},{"id":"gi_ESTJ","ilgan":"gi","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"구획 정리된 농지","summary":"관리력 + 살림력 = 모임 총무","point":"실속 기토 + 관리자 ESTJ = 가계부·일정·회비 정산 완벽. 근데 걱정까지 관리하려다 잔소리가 늘어남","annoying":"회비 정산을 원 단위까지 함","share":"1인당 12,347원 (계좌 공지함)"}},{"id":"gi_ESFJ","ilgan":"gi","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"동네 공동 텃밭","summary":"모두의 엄마, 모두의 반찬통","point":"남 챙기는 기토 + 살림꾼 ESFJ = 챙김 파워 2배. 근데 다 챙겨주고 반응 없으면 속으로 서운함이 싹틈","annoying":"반찬 싸줬는데 통 안 돌려주면 계속 기억함","share":"반찬통은 돌려주세요 (서운함 방지)"}},{"id":"gi_ENFJ","ilgan":"gi","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"사람 키우는 밭","summary":"네 성장, 내가 거름 줄게","point":"품는 기토 + 코칭 ENFJ = 후배·친구 키우는 데 진심. 대신 남 걱정하느라 내 밭은 잡초 무성","annoying":"남 이직 준비는 같이 해주고 본인 일은 미룸","share":"너는 잘될 거야 (나는 나중에)"}},{"id":"gi_ENTJ","ilgan":"gi","mbti":"ENTJ","chem":"충돌","mild":{"nickname":"개발 예정지","summary":"품을 땐 품고, 밀 땐 밀어버림","point":"둥근 기토 vs 결단 ENTJ → 평소엔 다 받아주다가 목표 앞에선 갑자기 불도저. 속으로 계산한 거 결국 다 실행함","annoying":"다 들어주는 척하더니 결론은 원래 자기 안","share":"의견 다 들었음. 결정은 내가 함"}},{"id":"gyeong_ISTJ","ilgan":"gyeong","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"강철 금고","summary":"원칙 + 원칙 = 예외 없음","point":"경금 결단력 + ISTJ 규칙 = 공과 사 칼같음. 부탁도 규정대로 처리해서 친한 사이여도 할인 없음","annoying":"친구가 늦어도 \"규칙은 규칙이야\"","share":"정 때문에 원칙 안 바꿈"}},{"id":"gyeong_ISFJ","ilgan":"gyeong","mbti":"ISFJ","chem":"충돌","mild":{"nickname":"솜 덮은 쇳덩이","summary":"말은 투박, 행동은 다정","point":"직설 경금 vs 상처 안 주려는 ISFJ → 할 말은 하는데 하고 나서 혼자 미안해함. 의리 + 챙김이라 내 사람한텐 끝까지","annoying":"팩폭 날리고 그날 밤 \"아까 말 심했나?\" 카톡","share":"말은 세게, 사과는 새벽에"}},{"id":"gyeong_INFJ","ilgan":"gyeong","mbti":"INFJ","chem":"충돌","mild":{"nickname":"칼집 속 칼","summary":"평소엔 조용, 선 넘으면 단칼","point":"정의감 경금 + 선 확실한 INFJ = 아닌 건 끝까지 아님. 겉으로는 차분한데 속에선 판결 이미 끝남","annoying":"조용히 듣다가 한 문장으로 상황 종료","share":"판결 났음. 항소 불가"}},{"id":"gyeong_INTJ","ilgan":"gyeong","mbti":"INTJ","chem":"시너지","mild":{"nickname":"정밀 가공된 강철","summary":"결단 + 전략 = 망설임 0초","point":"경금 결단력에 INTJ 설계까지 = 판단 빠르고 정확함. 대신 둘 다 돌려 말할 줄 몰라서 피드백이 칼","annoying":"\"솔직히 말해줘\" 했더니 진짜 솔직하게 말함","share":"물어봤으니까 답한 거임"}},{"id":"gyeong_ISTP","ilgan":"gyeong","mbti":"ISTP","chem":"시너지","mild":{"nickname":"공구함 속 렌치","summary":"말없이 고치고 감","point":"실전파 경금 + 손재주 ISTP = 고장 난 거 다 고침. 뒤끝 없음 × 귀찮음이라 싸워도 다음 날 아무 일 없었던 듯","annoying":"고민 얘기했더니 말없이 해결해 놓음 (위로는 없음)","share":"위로는 못 함. 고쳐줄게"}},{"id":"gyeong_ISFP","ilgan":"gyeong","mbti":"ISFP","chem":"충돌","mild":{"nickname":"빈티지 철제 소품","summary":"겉은 시크, 속은 은근 감성","point":"직설 경금 vs 부드러운 ISFP → 취향 얘기엔 칼같이 직설, 사람한텐 은근 여림. 의리는 있는데 표현이 서툼","annoying":"\"별로야\" 직설 날려놓고 선물은 감성 충만하게 준비","share":"무뚝뚝한데 선물 고르는 데 3시간 씀"}},{"id":"gyeong_INFP","ilgan":"gyeong","mbti":"INFP","chem":"충돌","mild":{"nickname":"칼날 위에 핀 꽃","summary":"정의감 + 감수성 = 분노하는 이상주의자","point":"경금 정의감에 INFP 신념이 붙어서 불의 보면 못 참음. 근데 말은 세게 해놓고 상처는 본인이 받음","annoying":"뉴스 보다가 혼자 분노하고 혼자 울음","share":"세상이 왜 이래 (진지함)"}},{"id":"gyeong_INTP","ilgan":"gyeong","mbti":"INTP","chem":"충돌","mild":{"nickname":"날 선 논리 칼","summary":"토론하면 뼈만 남음","point":"직설 경금 + 분석 INTP = 반박이 아니라 해부함. 승부욕까지 있어서 댓글 논쟁도 끝까지 이기려 함","annoying":"사소한 말에 \"그건 틀렸어. 이유는…\"","share":"감정 말고 논리로 오세요"}},{"id":"gyeong_ESTP","ilgan":"gyeong","mbti":"ESTP","chem":"시너지","mild":{"nickname":"번개 맞은 쇳덩이","summary":"결단 0초 + 실행 0초","point":"화끈한 경금 + 실전 ESTP = 추진력 폭발. 승부욕 둘이 만나 내기·게임은 무조건 진심","annoying":"보드게임 지면 \"한 판만 더\" 10번","share":"질 때까지 함. 근데 안 짐"}},{"id":"gyeong_ESFP","ilgan":"gyeong","mbti":"ESFP","chem":"시너지","mild":{"nickname":"번쩍이는 금장식","summary":"의리 있는 분위기 메이커","point":"의리 경금 + 텐션 ESFP = 내 사람 행사엔 무조건 참석. 근데 할 말은 해서 가끔 분위기 깨기도 함","annoying":"신나게 놀다가 갑자기 \"근데 너 그건 잘못했어\"","share":"놀 땐 놀고 말할 땐 말함"}},{"id":"gyeong_ENFP","ilgan":"gyeong","mbti":"ENFP","chem":"충돌","mild":{"nickname":"자석 달린 쇠","summary":"끌어당기는 힘 + 밀어붙이는 힘","point":"직진 경금 + 열정 ENFP → 꽂히면 바로 실행. 근데 ENFP 산만함 vs 경금 끝장 보기가 부딪혀서 시작과 포기가 둘 다 화끈","annoying":"\"이거 끝장 본다!\" → 2주 뒤 \"깔끔하게 접는다\"","share":"시작도 화끈, 정리도 화끈"}},{"id":"gyeong_ENTP","ilgan":"gyeong","mbti":"ENTP","chem":"시너지","mild":{"nickname":"양날의 검","summary":"논쟁 = 스포츠","point":"승부욕 경금 + 반박 ENTP = 말싸움 국가대표. 근데 뒤끝이 없어서 싸우고 바로 밥 먹으러 감","annoying":"토론 이기고 \"밥은 내가 살게\"","share":"졌으면 인정해. 밥은 사줄게"}},{"id":"gyeong_ESTJ","ilgan":"gyeong","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"철벽 관리자","summary":"말한 대로 됨. 안 되면 되게 함","point":"결단 경금 + 관리 ESTJ = 팀장 체질 최강. 근데 직설 × 잔소리라 팩트로 맞으면 아픔","annoying":"칭찬도 \"이번엔 괜찮네. 다음엔 더 잘해\"","share":"칭찬임. 진짜임"}},{"id":"gyeong_ESFJ","ilgan":"gyeong","mbti":"ESFJ","chem":"충돌","mild":{"nickname":"의리 철판","summary":"직설인데 다 챙김","point":"직설 경금 vs 분위기 챙기는 ESFJ → 할 말은 해야 하는데 분위기도 지켜야 해서 혼자 갈등. 내 사람 챙기는 의리는 둘 다 만렙","annoying":"\"솔직히 말할게\"로 시작해서 칭찬만 하고 끝남","share":"할 말 있었는데 분위기 보고 참음"}},{"id":"gyeong_ENFJ","ilgan":"gyeong","mbti":"ENFJ","chem":"충돌","mild":{"nickname":"정의의 깃발","summary":"옳은 쪽으로 다 끌고 감","point":"정의감 경금 + 리더 ENFJ = 단체의 대변인. 근데 코칭이 직설로 나와서 따뜻한 팩폭이 됨","annoying":"\"너 위해서 하는 말인데\" 하고 뼈 때림","share":"사랑해서 하는 팩폭임"}},{"id":"gyeong_ENTJ","ilgan":"gyeong","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"전장의 대검","summary":"목표 보면 직진, 장애물은 베고 감","point":"경금 결단 × ENTJ 추진력 = 리더십 끝판왕. 근데 둘 다 지는 걸 못 참아서 양보라는 단어가 사전에 없음","annoying":"가위바위보도 전략 짜고 함","share":"양보 기능 미탑재"}},{"id":"sin_ISTJ","ilgan":"sin","mbti":"ISTJ","chem":"시너지","mild":{"nickname":"진열장 속 보석","summary":"흐트러짐 0%","point":"완벽주의 신금 + 규칙 ISTJ = 책상 정리도 각 맞춤. 근데 남의 실수도 눈에 다 보여서 속으로 체크리스트 작성 중","annoying":"남의 오타 보이면 못 참고 수정 요청","share":"띄어쓰기 틀렸어요 (한 군데)"}},{"id":"sin_ISFJ","ilgan":"sin","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"포장까지 예쁜 선물","summary":"섬세함 × 섬세함","point":"디테일 신금 + 챙김 ISFJ = 선물 포장 리본까지 신경 씀. 근데 예민 + 기억력이라 서운한 디테일도 다 기억","annoying":"내가 준 선물 안 쓰고 있으면 바로 알아챔","share":"그 선물 아직 안 뜯었지? (알고 있음)"}},{"id":"sin_INFJ","ilgan":"sin","mbti":"INFJ","chem":"시너지","mild":{"nickname":"빛 받아야 보이는 원석","summary":"아무나 못 알아보는 사람","point":"예민한 신금 + 통찰 INFJ = 사람 보는 눈 날카로움. 첫인상 5초 만에 판단 끝, 근데 틀린 적 거의 없음","annoying":"\"그 사람 좀 별로야\" 하고 3달 뒤 맞음","share":"첫인상 적중률 97%"}},{"id":"sin_INTJ","ilgan":"sin","mbti":"INTJ","chem":"시너지","mild":{"nickname":"다이아몬드 커팅","summary":"완벽주의 2배, 타협 0","point":"신금 완벽주의 + INTJ 기준 = 내 기준 통과하기 하늘의 별 따기. 대신 결과물 퀄리티는 최상","annoying":"\"대충 해도 돼\" 해놓고 결국 본인이 다시 함","share":"대충이 안 되는 체질"}},{"id":"sin_ISTP","ilgan":"sin","mbti":"ISTP","chem":"충돌","mild":{"nickname":"정밀 공구","summary":"말은 짧고 날카로움","point":"예민 신금 vs 무심 ISTP → 겉으로는 쿨한데 거슬리는 건 정확히 짚음. 한마디가 짧은데 정곡","annoying":"3단어로 사람 멘탈 흔듦","share":"짧게 말함. 근데 아픔"}},{"id":"sin_ISFP","ilgan":"sin","mbti":"ISFP","chem":"시너지","mild":{"nickname":"핸드메이드 액세서리","summary":"취향 = 정체성","point":"미적 감각 신금 + 감성 ISFP = 인테리어·옷·플레이리스트 다 장인급. 근데 취향 건드리면 조용히 상처받음","annoying":"내 취향 별로라 하면 3일 동안 기억함","share":"취향 존중 부탁드립니다"}},{"id":"sin_INFP","ilgan":"sin","mbti":"INFP","chem":"시너지","mild":{"nickname":"유리 공예 보석","summary":"예쁘고 예민하고 진심","point":"섬세 신금 + 여린 INFP = 감수성 끝판왕. 남의 말 한마디에 반짝이기도 하고 금 가기도 함","annoying":"칭찬 한마디에 하루 행복, 지적 한마디에 일주일 시무룩","share":"취급 주의. 섬세함"}},{"id":"sin_INTP","ilgan":"sin","mbti":"INTP","chem":"충돌","mild":{"nickname":"현미경 렌즈","summary":"디테일 집착 + 논리 집착","point":"완벽주의 신금 + 분석 INTP = 오류 찾기 장인. 근데 말이 날카로워서 맞는 말인데 기분이 나쁨","annoying":"\"틀린 건 아닌데 정확하진 않아\"","share":"정확하게 말해주세요"}},{"id":"sin_ESTP","ilgan":"sin","mbti":"ESTP","chem":"충돌","mild":{"nickname":"번쩍이는 메달","summary":"멋있어야 함. 이겨야 함","point":"자존심 신금 + 승부 ESTP = 지는 것도, 촌스러운 것도 못 참음. 즉흥인데 스타일은 챙김","annoying":"급하게 나가도 거울은 3번 봄","share":"즉흥 외출 (스타일은 완벽)"}},{"id":"sin_ESFP","ilgan":"sin","mbti":"ESFP","chem":"시너지","mild":{"nickname":"스포트라이트 받는 보석","summary":"반짝이는 게 본업","point":"스타일 신금 + 무대 체질 ESFP = 카메라 각도 아는 사람. 근데 자존심이 세서 망한 사진은 즉시 삭제 요청","annoying":"단체 사진 내 얼굴 별로면 업로드 금지","share":"그 사진 내려주세요 (내가 별로임)"}},{"id":"sin_ENFP","ilgan":"sin","mbti":"ENFP","chem":"충돌","mild":{"nickname":"반짝이 폭탄","summary":"감성 폭발인데 기준은 깐깐","point":"자유로운 ENFP vs 깐깐한 신금 → 아이디어는 막 던지는데 결과물은 완벽해야 함. 시작은 쉽고 마무리는 고통","annoying":"\"대충 해보자!\" → 결국 밤새 디테일 수정","share":"대충 시작, 완벽 마무리 (밤샘)"}},{"id":"sin_ENTP","ilgan":"sin","mbti":"ENTP","chem":"충돌","mild":{"nickname":"날 선 혀","summary":"말 한마디가 칼","point":"날카로운 신금 + 반박 ENTP = 말빨 최강, 근데 자존심도 최강. 지는 거 못 참아서 말장난도 끝까지 감","annoying":"농담인데 너무 정확해서 웃기 애매함","share":"농담이었음 (팩트임)"}},{"id":"sin_ESTJ","ilgan":"sin","mbti":"ESTJ","chem":"시너지","mild":{"nickname":"품질 검수 담당","summary":"기준 미달은 반려","point":"완벽주의 신금 + 관리 ESTJ = 품질 관리자 체질. 결과물 보는 눈이 매서워서 통과하면 진짜 잘한 거","annoying":"보고서 폰트 크기까지 지적함","share":"내용은 좋음. 폰트가 문제임"}},{"id":"sin_ESFJ","ilgan":"sin","mbti":"ESFJ","chem":"충돌","mild":{"nickname":"광택 나는 은식기","summary":"다 챙기는데 디테일에 예민","point":"분위기 챙기는 ESFJ + 예민한 신금 = 모임 준비 완벽주의자. 근데 준비한 거 반응 없으면 속으로 금 감","annoying":"생일상 차려놓고 \"맛있어?\" 5번 확인","share":"맛있지? 맛있다고 해줘"}},{"id":"sin_ENFJ","ilgan":"sin","mbti":"ENFJ","chem":"충돌","mild":{"nickname":"왕관의 보석","summary":"이끄는데 품위 있게","point":"리더 ENFJ + 자존심 신금 = 사람 이끄는 것도 우아하게. 근데 기대치가 높아서 실망도 깊음","annoying":"\"난 너한테 기대했는데…\" 한마디로 사람 각성시킴","share":"기대하고 있음 (부담 가져도 됨)"}},{"id":"sin_ENTJ","ilgan":"sin","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"명품 시계","summary":"정확하고, 비싸고, 타협 없음","point":"완벽주의 신금 + CEO ENTJ = 퀄리티와 성과 둘 다 챙김. 근데 기준이 너무 높아서 본인도 가끔 숨참","annoying":"90점 받고 \"10점 어디 갔지?\"","share":"100점 아니면 다시 함"}},{"id":"im_ISTJ","ilgan":"im","mbti":"ISTJ","chem":"충돌","mild":{"nickname":"댐에 갇힌 강","summary":"흘러가고 싶은데 계획표가 막음","point":"자유로운 임수 vs 계획 ISTJ → 머릿속은 바다인데 행동은 정해진 수로로만. 대신 큰 그림도 그리고 세부도 챙기는 의외의 조합","annoying":"큰 꿈 얘기하다가 \"근데 일단 다음 주 일정부터\"","share":"꿈은 바다, 일정은 엑셀"}},{"id":"im_ISFJ","ilgan":"im","mbti":"ISFJ","chem":"충돌","mild":{"nickname":"잔잔한 호수","summary":"넓게 품는데 조용히","point":"포용 임수 + 챙김 ISFJ = 다 받아주는 넓은 마음. 근데 속을 안 보여주는 임수라 본인 힘든 건 바닥에 가라앉혀 둠","annoying":"다 들어주고 \"난 괜찮아\" (수심 측정 불가)","share":"겉은 잔잔, 속은 측정 불가"}},{"id":"im_INFJ","ilgan":"im","mbti":"INFJ","chem":"시너지","mild":{"nickname":"심해","summary":"깊이를 아는 사람이 없음","point":"속 모를 임수 + 비공개 INFJ = 미스터리 2배. 다 꿰뚫어 보는데 본인 속은 해저 1만 미터","annoying":"몇 년 친구인데 아직도 새로운 면이 발견됨","share":"아직 1%밖에 안 보여줬음"}},{"id":"im_INTJ","ilgan":"im","mbti":"INTJ","chem":"시너지","mild":{"nickname":"해류 읽는 항해사","summary":"큰 그림 + 전략 = 판 전체를 봄","point":"스케일 큰 임수 + 설계 INTJ = 10년 뒤를 보고 움직임. 근데 혼자 생각이 너무 멀리 가서 주변이 못 따라옴","annoying":"지금 얘기하는데 10년 뒤 얘기로 대답함","share":"지금 말고 10년 뒤 얘기 중"}},{"id":"im_ISTP","ilgan":"im","mbti":"ISTP","chem":"시너지","mild":{"nickname":"유유히 흐르는 강","summary":"급할 거 없음, 근데 할 땐 함","point":"흘러가는 임수 + 쿨한 ISTP = 스트레스 면역. 위기 상황에서도 \"어떻게든 되겠지\" 하고 진짜 됨","annoying":"마감 1시간 전에도 평온함","share":"어떻게든 됨 (실제로 됨)"}},{"id":"im_ISFP","ilgan":"im","mbti":"ISFP","chem":"시너지","mild":{"nickname":"노을 진 바다","summary":"자유로운 감성 여행자","point":"자유 임수 + 감성 ISFP = 즉흥 여행 장인. 근데 둘 다 흘러가는 대로라 계획은 출발 후에 생각","annoying":"\"바다 보고 싶다\" 하고 진짜 혼자 감","share":"잠깐 바다 보고 옴 (연락 안 됨)"}},{"id":"im_INFP","ilgan":"im","mbti":"INFP","chem":"시너지","mild":{"nickname":"꿈꾸는 바다","summary":"상상력의 스케일이 우주급","point":"큰 그림 임수 + 상상 INFP = 세계관 창조자. 머릿속에 소설 10편 연재 중인데 완결은 미정","annoying":"멍 때리는 줄 알았는데 머릿속에서 은하 하나 만듦","share":"멍 때리는 거 아님. 세계관 구축 중"}},{"id":"im_INTP","ilgan":"im","mbti":"INTP","chem":"시너지","mild":{"nickname":"탐사 중인 해저","summary":"궁금하면 끝까지 흘러감","point":"지혜 임수 + 탐구 INTP = 지식 블랙홀. 검색 하나 하다가 새벽 4시에 고대 문명까지 감","annoying":"\"그거 왜 그래?\" 물었더니 1시간 강의","share":"궁금하면 물어봐 (1시간 각오)"}},{"id":"im_ESTP","ilgan":"im","mbti":"ESTP","chem":"시너지","mild":{"nickname":"파도 타는 서퍼","summary":"흐름 타는 데 천재","point":"흐르는 임수 + 즉흥 ESTP = 상황 판단 0.1초. 기회 오면 바로 탐. 대신 한곳에 정착은 어려움","annoying":"계획 물어보면 \"흐름 봐서\"","share":"계획은 파도가 정함"}},{"id":"im_ESFP","ilgan":"im","mbti":"ESFP","chem":"시너지","mild":{"nickname":"워터파크","summary":"어디든 흘러가서 다 친해짐","point":"사교 임수 + 텐션 ESFP = 인맥 바다. 모임마다 얼굴 비추는데 다들 날 앎","annoying":"처음 간 모임에서 연락처 20개 받아옴","share":"거기 아는 사람 있어 (어디든)"}},{"id":"im_ENFP","ilgan":"im","mbti":"ENFP","chem":"시너지","mild":{"nickname":"범람하는 강","summary":"아이디어도 인맥도 넘침","point":"스케일 임수 + 폭발 ENFP = 꿈의 크기 무한대. 근데 둘 다 흘러가는 타입이라 마무리는 다음 물결에 맡김","annoying":"\"세계 일주 하자\" 하고 다음 주엔 \"우주 가자\"","share":"꿈은 커야지 (실행은 나중에)"}},{"id":"im_ENTP","ilgan":"im","mbti":"ENTP","chem":"시너지","mild":{"nickname":"소용돌이","summary":"말에 휘말리면 못 빠져나옴","point":"지혜 임수 + 반박 ENTP = 말발로 바다를 가름. 근데 속은 안 보여줘서 진심인지 장난인지 아무도 모름","annoying":"진지하게 설득해 놓고 \"농담이야~\" (농담 아님)","share":"진심일 수도 아닐 수도"}},{"id":"im_ESTJ","ilgan":"im","mbti":"ESTJ","chem":"충돌","mild":{"nickname":"운하","summary":"흘러가는데 정해진 길로","point":"자유 임수 vs 관리 ESTJ → 큰 그림은 좋은데 세부 관리는 귀찮음. 결국 남 관리할 땐 깐깐, 본인 관리는 흐름대로","annoying":"팀원 일정은 체크하는데 본인 일정은 까먹음","share":"규칙은 지켜. (나는 예외)"}},{"id":"im_ESFJ","ilgan":"im","mbti":"ESFJ","chem":"충돌","mild":{"nickname":"모두가 노는 해변","summary":"다 품는데 속은 모름","point":"포용 임수 + 살림꾼 ESFJ = 모임의 바다. 근데 ESFJ는 반응 기다리고 임수는 흘려보내서 서운함이 밀물썰물","annoying":"서운했는데 다음 날 아무 일 없던 듯 행동","share":"서운함은 썰물로 보냄"}},{"id":"im_ENFJ","ilgan":"im","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"모든 강이 모이는 바다","summary":"사람이 모여드는 사람","point":"포용 임수 + 리더 ENFJ = 자연스러운 구심점. 큰 그림 보여주면서 사람 끌어모으는 천재","annoying":"모임 주선했더니 100명 모임 됨","share":"다 같이 가자 (인원 제한 없음)"}},{"id":"im_ENTJ","ilgan":"im","mbti":"ENTJ","chem":"시너지","mild":{"nickname":"대양 건너는 함대","summary":"스케일 큰 정복자","point":"큰 그림 임수 + 추진 ENTJ = 사업가 체질. 목표가 동네가 아니라 글로벌","annoying":"동네 카페 창업 얘기하다가 해외 진출 계획 세움","share":"일단 세계 1등부터"}},{"id":"gye_ISTJ","ilgan":"gye","mbti":"ISTJ","chem":"충돌","mild":{"nickname":"정시에 내리는 비","summary":"감성은 촉촉, 일정은 칼같이","point":"감성 계수 vs 원칙 ISTJ → 속으로는 감정 풍부한데 겉으로는 규칙대로. 눈치 빨라서 분위기 다 알면서 일정은 안 바꿈","annoying":"분위기 다 읽어놓고 \"그래도 원래대로 하자\"","share":"감성은 있음. 일정 변경은 없음"}},{"id":"gye_ISFJ","ilgan":"gye","mbti":"ISFJ","chem":"시너지","mild":{"nickname":"새벽 이슬","summary":"모르는 새 다 챙겨놓음","point":"눈치 계수 + 챙김 ISFJ = 필요한 거 말하기 전에 해결. 근데 둘 다 표현 안 해서 서운함이 이슬처럼 맺힘","annoying":"다 챙겨주고 \"아니야 별거 아니야\" (기억함)","share":"별거 아니야 (별거임)"}},{"id":"gye_INFJ","ilgan":"gye","mbti":"INFJ","chem":"시너지","mild":{"nickname":"안개비","summary":"조용히 스며들어 다 알아버림","point":"눈치 계수 + 통찰 INFJ = 독심술 수준. 말 안 해도 다 아는데 본인 속은 안개 속","annoying":"\"너 오늘 무슨 일 있지?\" 99% 적중","share":"말 안 해도 다 알아"}},{"id":"gye_INTJ","ilgan":"gye","mbti":"INTJ","chem":"충돌","mild":{"nickname":"얼음 결정","summary":"감성 위에 차가운 계산","point":"감성 계수 vs 냉철 INTJ → 속은 촉촉한데 겉은 얼음. 지혜 + 전략이라 판 읽는 능력은 최강","annoying":"감동받았는데 표정은 \"음, 괜찮네\"","share":"감동받음 (표정은 결빙 중)"}},{"id":"gye_ISTP","ilgan":"gye","mbti":"ISTP","chem":"충돌","mild":{"nickname":"빗물 흐르는 바위","summary":"감성인데 쿨한 척","point":"감정 기복 계수 vs 쿨한 ISTP → 속은 비 오는데 겉은 맑음. 눈치는 빠른데 반응은 \"ㅇㅇ\"","annoying":"다 알아챘는데 아무 말 안 함","share":"알고 있었음. 말 안 했을 뿐"}},{"id":"gye_ISFP","ilgan":"gye","mbti":"ISFP","chem":"시너지","mild":{"nickname":"창문에 맺힌 빗방울","summary":"비 오는 날 감성 최고조","point":"감수성 계수 + 감성 ISFP = 분위기 장인. 비 오는 날 플레이리스트 큐레이션 1등","annoying":"비 온다고 약속 미루고 집에서 감성 충전","share":"비 오는 날은 쉽니다 (감성 휴무)"}},{"id":"gye_INFP","ilgan":"gye","mbti":"INFP","chem":"시너지","mild":{"nickname":"비 오는 날 일기장","summary":"감수성이 홍수","point":"감정 계수 + 상상 INFP = 감수성 2배. 영화 예고편만 봐도 울고, 상상으로 이별까지 경험","annoying":"슬픈 노래 듣다 혼자 서사 만들어서 울음","share":"아무 일 없음. 노래가 슬펐을 뿐"}},{"id":"gye_INTP","ilgan":"gye","mbti":"INTP","chem":"시너지","mild":{"nickname":"지하수","summary":"조용히 깊이 파고듦","point":"지혜 계수 + 분석 INTP = 조용한 천재. 눈에 안 띄는데 물어보면 다 앎","annoying":"조용하길래 몰랐는데 정답은 다 알고 있었음","share":"물어보면 대답함. 안 물어보면 안 함"}},{"id":"gye_ESTP","ilgan":"gye","mbti":"ESTP","chem":"충돌","mild":{"nickname":"소나기","summary":"갑자기 왔다가 갑자기 감","point":"스며드는 계수 vs 직진 ESTP → 눈치 빠른 즉흥러. 분위기 읽고 바로 치고 빠지는 타이밍 천재","annoying":"분위기 싸해지기 1초 전에 사라짐","share":"타이밍은 내가 정함"}},{"id":"gye_ESFP","ilgan":"gye","mbti":"ESFP","chem":"시너지","mild":{"nickname":"축제의 물풍선","summary":"분위기 다 읽는 인싸","point":"눈치 계수 + 텐션 ESFP = 분위기 맞춤형 인싸. 근데 집 가면 감정 기복 와서 갑자기 센치해짐","annoying":"모임에서 제일 신났는데 귀갓길에 혼자 감성 폭발","share":"파티 끝, 감성 타임 시작"}},{"id":"gye_ENFP","ilgan":"gye","mbti":"ENFP","chem":"시너지","mild":{"nickname":"무지개 뜨는 비","summary":"울다가 웃다가 반짝","point":"감정 기복 계수 + 폭발 ENFP = 감정 롤러코스터 탑승. 대신 공감력·상상력 합쳐서 사람 마음 녹이는 데 최강","annoying":"1시간 안에 울고 웃고 삐지고 화해함","share":"오늘 감정 날씨: 맑음 → 비 → 무지개"}},{"id":"gye_ENTP","ilgan":"gye","mbti":"ENTP","chem":"충돌","mild":{"nickname":"스며드는 독설","summary":"눈치로 약점 찾고 말로 찌름","point":"눈치 계수 + 반박 ENTP = 상대 약점 3초 만에 파악. 근데 계수 감성이라 너무 세게 치진 않음","annoying":"웃으면서 정곡 찌르고 \"아 농담~\"","share":"농담임 (근데 맞잖아)"}},{"id":"gye_ESTJ","ilgan":"gye","mbti":"ESTJ","chem":"충돌","mild":{"nickname":"관개수로","summary":"흐르는 감성을 관리함","point":"감성 계수 vs 관리 ESTJ → 사람 마음은 다 읽는데 결론은 규칙대로. 눈치 있는 관리자라 의외로 팀원 만족도 높음","annoying":"\"힘든 거 알아. 그래도 마감은 내일이야\"","share":"공감함. 마감은 지켜"}},{"id":"gye_ESFJ","ilgan":"gye","mbti":"ESFJ","chem":"시너지","mild":{"nickname":"단비","summary":"필요할 때 딱 와주는 사람","point":"눈치 계수 + 살림꾼 ESFJ = 타이밍 챙김의 신. 근데 서운함에도 예민해서 답장 늦으면 걱정 비가 내림","annoying":"읽씹 1시간에 \"나 뭐 잘못했어?\"","share":"괜찮아? 무슨 일 있어? (3번째)"}},{"id":"gye_ENFJ","ilgan":"gye","mbti":"ENFJ","chem":"시너지","mild":{"nickname":"마음 적시는 봄비","summary":"조용히 스며들어 사람을 바꿈","point":"스며드는 계수 + 코칭 ENFJ = 부드러운 영향력 끝판왕. 잔소리 없이 사람을 성장시킴","annoying":"설득당한 줄도 모르고 어느새 그 사람 말대로 하고 있음","share":"강요 안 했음. 스며들었을 뿐"}},{"id":"gye_ENTJ","ilgan":"gye","mbti":"ENTJ","chem":"충돌","mild":{"nickname":"바위 뚫는 물방울","summary":"부드럽게, 끈질기게, 결국 이김","point":"조용한 계수 + 야망 ENTJ = 티 안 나는 전략가. 정면 돌파 대신 스며들어서 결국 목표 달성","annoying":"아무도 몰랐는데 이미 판 다 짜놓음","share":"한 방울씩. 결국 뚫음"}}];
+const IL = {
+ gap:["갑목","甲","목","#2f8f4e"], eul:["을목","乙","목","#4a9e3f"],
+ byeong:["병화","丙","화","#e0432b"], jeong:["정화","丁","화","#d2573e"],
+ mu:["무토","戊","토","#b67a12"], gi:["기토","己","토","#a8761e"],
+ gyeong:["경금","庚","금","#6b7787"], sin:["신금","辛","금","#7f7a8e"],
+ im:["임수","壬","수","#1d4e89"], gye:["계수","癸","수","#2f6a9e"]
+};
+const STEMS = ["gap","eul","byeong","jeong","mu","gi","gyeong","sin","im","gye"];
+const SIT = {"situations":["love","work","friend","stress"],"ilgan":{"gap":{"love":{"tag":"먼저 고백하는 쪽","text":"좋아하면 돌려 말 안 하고 직진함. 대신 연애에서도 리드하고 싶어서 데이트 코스 결정권은 은근 내가 쥐고 있음."},"work":{"tag":"반장 자리 자동 배정","text":"회의 3분 만에 \"그럼 이렇게 하자\" 정리하는 사람. 추진력은 최고인데 내 방식 지적받으면 표정부터 굳음."},"friend":{"tag":"그늘 넓은 큰형·큰언니","text":"내 사람이라고 정하면 끝까지 챙김. 근데 약속 장소·메뉴도 내가 정해야 마음이 편함."},"stress":{"tag":"꺾이느니 부러짐","text":"힘들어도 티 안 내고 밀어붙이다가 한 번에 뚝. 누가 \"네가 맞아\" 한마디 해주면 회복이 빠름."}},"eul":{"love":{"tag":"스며드는 연애","text":"티 안 나게 옆에 있다가 어느새 사귀고 있음. 맞춰주는 것 같지만 결국 원하는 방향으로 데려감."},"work":{"tag":"적응력 만렙 생존왕","text":"어느 팀에 넣어도 3일이면 적응. 정면충돌 대신 돌아가는 길을 찾아서 결국 해냄."},"friend":{"tag":"모든 단톡방에 있음","text":"누구랑도 잘 지내서 인맥이 덩굴처럼 뻗어 있음. 근데 진짜 속마음 아는 친구는 손에 꼽힘."},"stress":{"tag":"웃으면서 버팀","text":"힘들어도 \"괜찮아~\" 하고 질기게 버팀. 다 버티고 나서야 혼자 조용히 무너졌다가 다시 일어남."}},"byeong":{"love":{"tag":"표정에 다 써 있음","text":"좋아하면 숨기는 기능이 없음. 주변 사람이 본인보다 먼저 알아챔. 서운하면 그것도 얼굴에 생중계."},"work":{"tag":"팀 분위기 담당","text":"내가 신나면 팀 전체 텐션이 오름. 대신 지루한 반복 업무 앞에선 태양도 구름 낌."},"friend":{"tag":"모임 소환 1순위","text":"리액션이 좋아서 어디 가든 불려 다님. 오지랖도 넓어서 친구 고민을 내 일처럼 해결하러 감."},"stress":{"tag":"5분 폭발, 5분 회복","text":"화나면 바로 티 나는데 뒤끝이 없음. 맛있는 거 먹으면 해결되는 경우가 대부분."}},"jeong":{"love":{"tag":"조용히 오래 타는 촛불","text":"한번 좋아하면 깊고 오래감. 작은 말도 오래 기억해서 감동도 서운함도 차곡차곡 쌓임."},"work":{"tag":"꽂히면 밤샘","text":"관심 가는 일엔 몰입력이 미쳤음. 겉으론 차분한데 속으로는 완성도에 불타는 중."},"friend":{"tag":"찐친한테만 켜지는 불","text":"아무한테나 마음 안 엶. 대신 내 사람한텐 손편지·기념일 챙기는 찐 따뜻함."},"stress":{"tag":"\"괜찮아\" (안 괜찮음)","text":"힘들수록 괜찮다고 함. 혼자 곱씹다가 새벽에 감정 정리 일기 쓰는 타입."}},"mu":{"love":{"tag":"흔들리지 않는 산","text":"썸은 느리지만 시작하면 든든함 최강. 상대가 불안해할 일을 안 만드는 안정형 연애."},"work":{"tag":"믿고 맡기는 1순위","text":"위기 때 제일 침착함. 속도는 느려도 맡은 건 무조건 끝냄. 다만 갑자기 바뀌는 일정엔 약함."},"friend":{"tag":"고민 상담소 사장님","text":"다 들어주고 다 품어줌. 근데 답장이 느려서 \"읽었으면 답 좀\" 소리 자주 들음."},"stress":{"tag":"겉은 평온, 속은 저장 중","text":"힘들어도 표정 변화 0. 혼자 오래 품고 있다가 한참 뒤에 \"그때 좀 힘들었어\" 고백함."}},"gi":{"love":{"tag":"알뜰살뜰 챙김형","text":"상대 취향·일정·컨디션까지 다 기억함. 좋아할수록 걱정도 늘어서 \"밥은?\" 연락이 잦아짐."},"work":{"tag":"실속 챙기는 살림꾼","text":"숫자·일정·자원 관리에 강함. 드러나진 않아도 기토가 빠지면 팀이 바로 티 남."},"friend":{"tag":"모임 총무 자동 당첨","text":"회비·예약·정산을 조용히 다 해둠. 다들 편하게 놀게 해주고 본인은 뒤에서 인원 체크."},"stress":{"tag":"걱정 시뮬레이션 가동","text":"일어나지 않은 일까지 미리 걱정함. 누가 \"괜찮아, 대비 다 됐어\" 해주면 그제야 잠듦."}},"gyeong":{"love":{"tag":"의리 연애","text":"좋으면 좋다, 싫으면 싫다 확실함. 한번 내 사람이면 무슨 일이 있어도 편 들어줌."},"work":{"tag":"결단의 칼","text":"고민 길게 안 함. 판단도 실행도 빠름. 대신 돌려 말하기가 안 돼서 피드백이 아플 수 있음."},"friend":{"tag":"뒤끝 없는 의리파","text":"싸워도 다음 날 아무렇지 않음. 친구 일에 불의가 보이면 제일 먼저 나서는 사람."},"stress":{"tag":"부딪혀서 해결","text":"참는 것보다 정면 돌파가 편함. 운동하거나 한판 시원하게 말하고 나면 오히려 개운해짐."}},"sin":{"love":{"tag":"디테일로 감동 주는 사람","text":"작은 것까지 섬세하게 챙김. 대신 기대치가 높아서 기념일 대충 넘기면 조용히 기억함."},"work":{"tag":"완벽주의 검수관","text":"결과물 퀄리티 하나는 확실함. 남의 실수도 잘 보여서 \"이거 오타요\"를 참기 어려움."},"friend":{"tag":"취향 확실한 감각파","text":"옷·맛집·인테리어 추천은 믿고 따라가도 됨. 다만 취향 무시당하면 은근 상처받음."},"stress":{"tag":"예민 모드 ON","text":"작은 말 하나에도 날이 섬. 혼자 정리할 시간 + 좋아하는 물건 쇼핑으로 광택 회복."}},"im":{"love":{"tag":"속을 알 수 없는 바다","text":"다정한데 어디까지가 진심인지 헷갈리게 함. 자유를 존중해 주는 사람한테 가장 깊이 빠짐."},"work":{"tag":"큰 그림 설계자","text":"남들 내일 볼 때 혼자 5년 뒤 봄. 세부 마감 관리는 약해서 꼼꼼한 파트너가 있으면 무적."},"friend":{"tag":"어디든 아는 사람 있음","text":"흘러가는 곳마다 사람을 사귐. 인맥은 바다처럼 넓은데 연락은 파도처럼 들쭉날쭉."},"stress":{"tag":"흘려보내기","text":"답답하면 훌쩍 떠나거나 생각을 딴 데로 돌림. 시간이 지나면 진짜로 다 흘려보냄."}},"gye":{"love":{"tag":"촉촉한 감성 연애","text":"분위기와 감정 흐름에 민감함. 상대 기분 변화는 1초 만에 알아채는데 본인 마음은 잘 말 안 함."},"work":{"tag":"조용한 브레인","text":"눈에 띄진 않는데 물어보면 답을 다 알고 있음. 분위기 읽는 능력으로 갈등도 미리 막음."},"friend":{"tag":"말 안 해도 아는 친구","text":"\"너 오늘 무슨 일 있지?\"가 거의 맞음. 위로가 필요할 때 제일 먼저 생각나는 사람."},"stress":{"tag":"감정 장마철","text":"기분이 날씨처럼 오락가락. 비 오는 날 노래 들으며 실컷 감성 타고 나면 맑아짐."}}},"mbti":{"ISTJ":{"love":{"tag":"기념일 엑셀 관리","text":"말보다 행동. 약속 시간·기념일은 절대 안 잊음. 깜짝 이벤트보다 꾸준함이 무기."},"work":{"tag":"매뉴얼 그 자체","text":"절차를 지키면 실수가 없다는 걸 앎. 즉흥 지시엔 \"근거가 뭐예요?\""},"friend":{"tag":"10년 지기 전문","text":"새 친구 사귀는 건 느려도 한번 친구면 평생. 약속 깨는 친구는 조용히 거리 둠."},"stress":{"tag":"계획 틀어지면 멘붕","text":"변수가 생기면 스트레스 급상승. 할 일 목록 다시 짜는 게 곧 회복."}},"ISFJ":{"love":{"tag":"말 안 해도 챙겨줌","text":"상대 취향을 다 기억해서 필요한 걸 먼저 내밂. 본인 서운함은 말 안 하고 쌓아둠."},"work":{"tag":"숨은 MVP","text":"티 안 나게 빈 곳을 다 메움. 칭찬 한마디에 1년 버팀."},"friend":{"tag":"모두의 수호천사","text":"생일·고민·취향 다 기억하는 친구. 거절을 못 해서 부탁이 몰림."},"stress":{"tag":"참다가 혼자 지침","text":"갈등이 싫어서 다 참다가 방전됨. 조용히 쉬면서 좋아하는 음식 먹는 게 최고 회복."}},"INFJ":{"love":{"tag":"깊은 연결 아니면 안 함","text":"가볍게 만나는 거 못 함. 영혼까지 통하는 사람이어야 마음을 엶."},"work":{"tag":"의미 찾는 사람","text":"왜 하는지 납득되면 누구보다 몰입함. 의미 없는 일은 체력이 두 배로 빠짐."},"friend":{"tag":"소수정예 찐친","text":"친구 수는 적지만 깊이가 남다름. 선 넘으면 경고 없이 문 닫음."},"stress":{"tag":"혼자 동굴행","text":"사람에 지치면 연락 끊고 동굴로 감. 충분히 혼자 있으면 다시 나옴."}},"INTJ":{"love":{"tag":"연애도 전략적","text":"좋아하는 사람에게도 효율을 따짐. 대신 한번 정하면 장기 플랜에 상대를 넣어둠."},"work":{"tag":"혼자 다 설계함","text":"큰 그림과 실행 계획이 머릿속에 이미 있음. 결론 없는 회의는 시간 낭비로 보임."},"friend":{"tag":"적지만 확실한 사람들","text":"아무랑 안 어울림. 대화가 통하는 몇 명이면 충분."},"stress":{"tag":"통제 불가 상황이 적","text":"계획이 남 때문에 틀어지면 짜증 폭발. 혼자 정리하고 다시 계획 세우면 해결."}},"ISTP":{"love":{"tag":"쿨한 듯 은근 챙김","text":"말은 짧지만 고장 난 거 말없이 고쳐줌. 구속하면 바로 멀어짐."},"work":{"tag":"문제 해결사","text":"말 대신 손이 먼저 감. 위기 상황에서 제일 침착하게 해결."},"friend":{"tag":"같이 있어도 편한 친구","text":"말 안 해도 어색하지 않음. 연락은 드물어도 만나면 그대로."},"stress":{"tag":"전원 OFF","text":"말수 줄고 혼자만의 시간 필요. 게임·운동·만들기에 몰두하면 충전 완료."}},"ISFP":{"love":{"tag":"취향 맞으면 금사빠","text":"감성 통하는 사람한테 빠르게 빠짐. 표현은 서툴러도 마음은 진심."},"work":{"tag":"감각 장인","text":"디자인·분위기 감각이 좋음. 압박 주면 능률 뚝, 자유 주면 결과물 반짝."},"friend":{"tag":"편안한 힐링 친구","text":"갈등 없이 잔잔하게 오래 감. 약속은 귀찮아해도 막상 만나면 잘 놂."},"stress":{"tag":"침대랑 합체","text":"누워서 음악 듣고 혼자 있으면 회복됨. 억지로 끌어내면 역효과."}},"INFP":{"love":{"tag":"로맨스 소설 주인공","text":"머릿속에서 이미 연애 시즌 3까지 씀. 진심으로 사랑하지만 현실 연애는 조금 서툼."},"work":{"tag":"가치가 맞아야 움직임","text":"신념에 맞는 일이면 엄청난 몰입. 안 맞으면 몸이 안 움직임."},"friend":{"tag":"공감 끝판왕","text":"친구 얘기 들으면서 같이 울어줌. 대신 상처도 잘 받아서 말 조심 필요."},"stress":{"tag":"상상 속 최악 시나리오","text":"혼자 곱씹다가 우울 루프. 일기 쓰기·좋아하는 콘텐츠 몰아보기가 탈출구."}},"INTP":{"love":{"tag":"관심 있으면 질문 폭격","text":"좋아하는 사람이 궁금해서 분석함. 표현은 서툴러도 대화가 통하면 깊이 빠짐."},"work":{"tag":"아이디어 연구소","text":"논리적 허점은 귀신같이 찾음. 반복 업무는 미루고 흥미로운 문제엔 밤샘."},"friend":{"tag":"연락은 드물게, 대화는 깊게","text":"단톡 읽씹 장인이지만 만나면 새벽까지 토론 가능."},"stress":{"tag":"분석으로 회피","text":"감정을 논리로 정리하려 함. 혼자 관심 분야 파고들면서 회복."}},"ESTP":{"love":{"tag":"밀당보다 직진","text":"좋으면 바로 표현하고 바로 만남. 지루한 연애는 못 견딤."},"work":{"tag":"현장 해결사","text":"말보다 실행. 위기와 협상에 강하지만 긴 보고서는 질색."},"friend":{"tag":"놀 거리 담당","text":"갑자기 \"지금 나와\"를 외치는 친구. 같이 있으면 심심할 틈이 없음."},"stress":{"tag":"몸으로 푼다","text":"가만히 있으면 더 답답함. 운동·드라이브·즉흥 여행으로 털어냄."}},"ESFP":{"love":{"tag":"표현 만렙","text":"좋아하는 마음을 온몸으로 표현. 데이트는 늘 이벤트처럼 즐거워야 함."},"work":{"tag":"분위기 메이커","text":"사람 상대하는 일에 최강. 반복 서류 업무엔 텐션 급하락."},"friend":{"tag":"모임의 주인공","text":"어디서든 웃음 담당. 사진은 무조건 내가 찍고 내가 올림."},"stress":{"tag":"사람 만나서 충전","text":"혼자 있으면 더 우울. 친구 불러서 맛있는 거 먹으면 금방 회복."}},"ENFP":{"love":{"tag":"설렘 중독","text":"새로운 사람·새로운 데이트에 설렘 폭발. 마음 가면 올인, 식으면 티 남."},"work":{"tag":"아이디어 폭죽","text":"기획·브레인스토밍 최강. 시작은 10개, 끝내는 건 2개."},"friend":{"tag":"인맥 문어발","text":"친구의 친구도 다 친구. 누구든 금방 편하게 만들어 줌."},"stress":{"tag":"롤러코스터","text":"신났다가 갑자기 다운. 좋아하는 사람이랑 수다 떨면 금방 다시 반짝."}},"ENTP":{"love":{"tag":"티키타카가 곧 사랑","text":"말이 잘 통하는 사람에게 빠짐. 장난으로 놀리는 게 애정 표현."},"work":{"tag":"반박 장인","text":"기존 방식에 \"왜?\"를 던짐. 새 판 짜는 데 천재, 마무리는 남에게 토스."},"friend":{"tag":"토론 친구","text":"말싸움도 놀이. 진지한 얘기도 농담처럼 해서 진심 파악이 어려움."},"stress":{"tag":"새 자극으로 탈출","text":"지루함이 최대의 적. 새 프로젝트·새 취미에 꽂히면서 리셋."}},"ESTJ":{"love":{"tag":"책임감 연애","text":"약속은 칼같이, 계획은 확실하게. 연애도 미래 계획까지 같이 세움."},"work":{"tag":"타고난 관리자","text":"일정·역할·마감 정리 최강. 규칙 안 지키는 사람 보면 잔소리 장전."},"friend":{"tag":"모임 추진위원장","text":"말만 하는 약속 싫어함. \"그래서 언제 볼 건데?\"로 날짜 확정시킴."},"stress":{"tag":"일로 푼다","text":"불확실한 게 제일 싫음. 할 일 처리하고 정리하면 스트레스도 정리됨."}},"ESFJ":{"love":{"tag":"다정함 풀옵션","text":"상대 반응 하나하나에 신경 씀. 사랑받는다는 확인이 자주 필요함."},"work":{"tag":"팀 살림꾼","text":"다들 잘 지내는지 챙기는 사람. 팀 분위기가 나쁘면 일도 손에 안 잡힘."},"friend":{"tag":"단톡방 엄마·아빠","text":"생일 챙기기·모임 공지 담당. 읽씹당하면 은근 상처."},"stress":{"tag":"인정받고 싶음","text":"내 노력이 무시당할 때 제일 힘듦. \"고마워\" 한마디면 바로 회복."}},"ENFJ":{"love":{"tag":"상대를 키우는 연애","text":"좋아하는 사람의 잠재력을 믿어줌. 가끔 너무 열심히 코칭해서 부담이 될 수도."},"work":{"tag":"사람을 움직이는 리더","text":"동기부여·발표·설득에 강함. 팀원 고민까지 다 들어주다 본인 일이 밀림."},"friend":{"tag":"인생 상담 선생님","text":"친구 일을 내 일처럼 고민해줌. 조언이 길어지는 건 애정 때문."},"stress":{"tag":"남 챙기다 번아웃","text":"모두를 챙기다 본인이 방전. 진짜 친한 사람 앞에서 털어놓으면 회복."}},"ENTJ":{"love":{"tag":"연애도 목표 지향","text":"좋아하면 확실하게 리드함. 미래 계획에 상대가 들어가 있으면 진심이라는 뜻."},"work":{"tag":"CEO 모드","text":"목표 정하고 사람 배치하고 밀어붙임. 비효율과 핑계는 못 참음."},"friend":{"tag":"든든한 대장","text":"친구 문제도 해결책부터 제시함. 위로보다 실행 계획이 먼저 나옴."},"stress":{"tag":"통제력 상실이 최악","text":"계획대로 안 되면 일을 더 늘려서 통제하려 함. 성과 하나 내면 바로 회복."}}}};
+const SIT_T = {love:"💕 연애할 때", work:"💼 일할 때", friend:"👯 친구 사이", stress:"🔥 스트레스 받을 때"};
+const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const MAP = {}; COMBOS.forEach(c => MAP[c.id] = c);
+const TOTAL = COMBOS.length;
+const CNT = {}; COMBOS.forEach(c => CNT[c.chem] = (CNT[c.chem] || 0) + 1);
+const rareText = c => `${TOTAL}개 조합 중 단 1개 · ${c.chem}형은 전체의 ${Math.round(CNT[c.chem] / TOTAL * 100)}%`;
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = ms => new Promise(r => setTimeout(r, RM ? 0 : ms));
+const PAIRS = [["E","I"],["S","N"],["T","F"],["J","P"]];
+const NAMES = {E:"외향",I:"내향",S:"감각",N:"직관",T:"사고",F:"감정",J:"판단",P:"인식"};
+let pick = ["I","N","F","P"];
+const $ = id => document.getElementById(id);
+
+// MBTI 4글자 토글
+const mb = $("mb");
+const drawMb = () => {
+  mb.innerHTML = PAIRS.map((p,i) => p.map(l =>
+    `<button type="button" data-i="${i}" data-l="${l}" class="${pick[i]===l?'on':''}" aria-pressed="${pick[i]===l}">${l}<small>${NAMES[l]}</small></button>`).join("")).join("");
+};
+// 2x4 → 열 순서로 보이게: E/I 가 한 열
+mb.style.gridAutoFlow = "column"; mb.style.gridTemplateRows = "repeat(2,auto)";
+drawMb();
+mb.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  pick[+b.dataset.i] = b.dataset.l; drawMb();
+});
+
+// 일간 계산: 1900-01-01 = 甲戌일(60갑자 10번째) 기준
+function dayStem(y, m, d, late) {
+  const days = Math.round((Date.UTC(y, m-1, d) - Date.UTC(1900,0,1)) / 864e5) + (late ? 1 : 0);
+  return STEMS[(((10 + days) % 60) + 60) % 60 % 10];
+}
+
+// 찰떡/상극 TOP 3
+const EL = {gap:0,eul:0,byeong:1,jeong:1,mu:2,gi:2,gyeong:3,sin:3,im:4,gye:4};
+const ELN = ["목","화","토","금","수"];
+const HAP = {gap:"gi",gi:"gap",eul:"gyeong",gyeong:"eul",byeong:"sin",sin:"byeong",jeong:"im",im:"jeong",mu:"gye",gye:"mu"};
+function sajuRel(a, b) {
+  const ea = EL[a], eb = EL[b];
+  if (HAP[a] === b) return [3, `${IL[a][1]}${IL[b][1]}합 — 사주에서 손꼽히는 천생연분 짝`];
+  if (ea === eb) return [1, `같은 ${ELN[ea]} 기운 — 말 안 해도 통하는 동지`];
+  if ((ea + 1) % 5 === eb) return [2, `${ELN[ea]}생${ELN[eb]} — 내가 상대 기운을 키워줌`];
+  if ((eb + 1) % 5 === ea) return [2, `${ELN[eb]}생${ELN[ea]} — 상대가 내 기운을 채워줌`];
+  if ((ea + 2) % 5 === eb) return [-2, `${ELN[ea]}극${ELN[eb]} — 내가 자꾸 이기려 드는 사이`];
+  return [-2, `${ELN[eb]}극${ELN[ea]} — 상대 앞에선 기가 눌리는 사이`];
+}
+function mbtiRel(a, b) {
+  let s = 0; const good = [], bad = [];
+  if (a[1] === b[1]) { s += 2; good.push(a[1] === "N" ? "N끼리 대화 코드 일치" : "S끼리 현실 감각 일치"); }
+  else bad.push("S·N 달라서 대화가 자꾸 엇나감");
+  if (a[0] !== b[0]) { s += 1; good.push("E·I 반대라 서로 채워줌"); }
+  else bad.push(a[0] === "E" ? "둘 다 밖으로만 나돎" : "둘 다 먼저 연락 안 함");
+  if (a[3] !== b[3]) { s += 1; good.push("J·P 반대라 계획·즉흥 밸런스"); }
+  else bad.push(a[3] === "J" ? "둘 다 자기 계획대로 하려 함" : "둘 다 즉흥이라 아무도 안 정함");
+  return [s, good, bad];
+}
+const hh = s => { let a = 7; for (const ch of s) a = (a * 31 + ch.charCodeAt(0)) >>> 0; return a; };
+function rel(me, o) {
+  const [ss, st] = sajuRel(me.ilgan, o.ilgan), [ms, good, bad] = mbtiRel(me.mbti, o.mbti), s = ss + ms;
+  return {c:o, s, ss, pct: Math.round(30 + (s + 2) * 68 / 9), st, good, bad, h: hh(me.id + o.id)};
+}
+function pickTop(list) {
+  const out = [], ui = new Set(), um = new Set();
+  for (const r of list) { if (out.length === 3) break; if (ui.has(r.c.ilgan) || um.has(r.c.mbti)) continue; out.push(r); ui.add(r.c.ilgan); um.add(r.c.mbti); }
+  for (const r of list) { if (out.length === 3) break; if (!out.includes(r)) out.push(r); }
+  return out;
+}
+// 둘이 있으면 생기는 일 (상황극 한 줄)
+function skit(me, r, good, used) {
+  const a = me.mbti, b = r.c.mbti, o = b, L = [];
+  if (good) {
+    if (r.ss === 3) L.push(["처음 만난 날", "10분 만에 \"우리 어디서 본 적 있지 않아?\""]);
+    if (a[3] !== b[3]) L.push(["여행 가면", a[3] === "J" ? `내가 일정표 짜고, ${o} 덕에 계획에 없던 맛집 하나 더 감` : `${o}가 일정표 짜고, 나는 그 사이 숨은 맛집 찾아냄`]);
+    if (a[0] !== b[0]) L.push(["모임 가면", a[0] === "E" ? `내가 분위기 띄우고, ${o}는 옆에서 제일 크게 웃어줌` : `${o}가 말 다 해줘서 나는 편하게 리액션만 함`]);
+    if (a[1] === b[1]) L.push(a[1] === "N" ? ["새벽 2시 통화", "외계인 얘기로 시작해서 인생 얘기로 끝남. 둘 다 안 잠"] : ["맛집 가면", "메뉴판 펴자마자 둘이 동시에 \"이거\""]);
+    if (r.ss === 2) L.push(["힘든 날", "연락 한 통이면 기운 충전 완료"]);
+    if (r.ss === 1) L.push(["말 안 해도", "눈빛만 봐도 \"아 그거?\" 통함"]);
+    L.push(["결론", "같이 있으면 시간 순삭"]);
+  } else {
+    if (a[1] !== b[1]) L.push(["대화하면", a[1] === "N" ? `나는 "만약에~" 얘기하는데 ${o}는 "그래서 결론이 뭔데?"` : `${o}가 "만약 좀비가 오면" 하는데 나는 "그럴 일 없어"`]);
+    if (a[0] === b[0]) L.push(a[0] === "E" ? ["주말에", "둘 다 약속 잡느라 정작 둘이 볼 시간이 없음"] : ["싸우고 나면", "둘 다 먼저 연락 안 해서 냉전 3주째"]);
+    if (a[3] === b[3]) L.push(["여행 가면", a[3] === "J" ? "일정표가 두 개라 출발 전부터 회의" : "둘 다 \"가서 정하자\" 했다가 숙소 없음"]);
+    if (r.ss === -2) L.push(["의견 갈리면", "둘 다 내 말이 맞다고 끝까지 감"]);
+    L.push(["결론", "부딪히는 만큼 배울 것도 많은 사이 (아마도)"]);
+  }
+  const p = L.find(x => !used.has(x[0])) || L[0];
+  used.add(p[0]); return p;
+}
+const mItem = (r, i, good, me, used) => {
+  const o = r.c, il = IL[o.ilgan], top = good && i === 0, sk = skit(me, r, good, used);
+  const why = [r.st, ...(good ? r.good : r.bad).slice(0, top ? 2 : 1)];
+  const ul = `<ul class="why">${why.map(w => `<li>${esc(w)}</li>`).join("")}</ul>`;
+  return `<li class="mi${top ? " top" : ""}" tabindex="0" role="button" data-id="${o.id}" aria-label="${il[0]} ${o.mbti} 결과 보기" style="--c:${good ? "#2b9a55" : "#d23f31"};--e:${il[3]}"><div class="rk">${i + 1}</div><div>
+    <div class="mt1"><span class="c2 e">${il[0]} ${il[1]}</span><span class="c2 e">${o.mbti}</span><span class="pct">${r.pct}%</span></div>
+    <b class="mn">${esc(o.mild.nickname)}</b>${top ? `<span class="ms">${esc(o.mild.summary)}</span>` : ""}
+    <p class="sk"><b>${esc(sk[0])}</b>${esc(sk[1])}</p>
+    ${top ? ul : `<details class="wy"><summary>왜 ${good ? "잘 맞아?" : "안 맞아?"}</summary>${ul}</details>`}<span class="more">이 조합 결과 보기 ›</span></div></li>`;
+};
+let topBest = null, mine = null;
+function ranks(me) {
+  const rs = COMBOS.filter(o => o.id !== me.id).map(o => rel(me, o));
+  return {
+    best: pickTop([...rs].sort((a, b) => b.s - a.s || b.ss - a.ss || a.h - b.h)),
+    worst: pickTop([...rs].sort((a, b) => a.s - b.s || a.ss - b.ss || a.h - b.h))
+  };
+}
+function drawMatch(me) {
+  const {best, worst} = ranks(me), ub = new Set(), uw = new Set();
+  $("mBest").innerHTML = best.map((r, i) => mItem(r, i, true, me, ub)).join("");
+  $("mWorst").innerHTML = worst.map((r, i) => mItem(r, i, false, me, uw)).join("");
+  topBest = best[0];
+  const lab = r => `${IL[r.c.ilgan][0]} ${r.c.mbti} ${r.pct}%`;
+  $("tz").innerHTML = `<span class="g">찰떡 1위<b>${lab(best[0])}</b><small>잘 맞는 TOP 3 보기 ↓</small></span><span class="r">상극 1위<b>${lab(worst[0])}</b><small>안 맞는 TOP 3 보기 ↓</small></span>`;
+}
+
+let cur = null;
+function show(c) {
+  cur = c;
+  const il = IL[c.ilgan], t = T(c);
+  document.documentElement.style.setProperty("--el", il[3]);
+  const card = $("card");
+  card.dataset.han = il[1];
+  $("cIl").textContent = `${il[0]} ${il[1]}`;
+  $("cMb").textContent = c.mbti;
+  $("cCh").textContent = (c.chem === "시너지" ? "시너지 조합" : "충돌 조합") + (spicy ? " · 매운맛" : "");
+  card.classList.toggle("hot", spicy);
+  $("bSpicy").textContent = spicy ? "순한맛으로 돌아가기" : "매운맛 보기";
+  $("bSpicy").setAttribute("aria-pressed", spicy);
+  drawFt(c);
+  $("cNick").textContent = t.nickname;
+  $("cSum").textContent = t.summary;
+  $("cPt").textContent = t.point;
+  $("cAn").textContent = t.annoying;
+  $("cSh").textContent = "“" + t.share + "”";
+  $("cRare").textContent = rareText(c);
+  const si = SIT.ilgan[c.ilgan], sm = SIT.mbti[c.mbti];
+  $("sitLead").textContent = `${il[0]} 기질 + ${c.mbti} 성향, 두 개를 겹쳐서 보면 내가 보여요.`;
+  $("sitList").innerHTML = SIT.situations.map(k => `
+    <section class="sc"><h3>${SIT_T[k]}</h3>
+      <div class="row"><div class="who">${il[0]}</div><div><b>${esc(si[k].tag)}</b><span>${esc(si[k].text)}</span><div class="rx" data-k="i_${c.ilgan}_${k}" data-g="${il[0]}"></div></div></div>
+      <div class="row"><div class="who">${c.mbti}</div><div><b>${esc(sm[k].tag)}</b><span>${esc(sm[k].text)}</span><div class="rx" data-k="m_${c.mbti}_${k}" data-g="${c.mbti}"></div></div></div>
+    </section>`).join("");
+  const mineV = !mine || c.id === mine.id;
+  $("peek").style.display = mineV ? "none" : "flex";
+  $("peekT").textContent = `${il[0]} ${c.mbti} 결과 구경 중`;
+  $("mTitle").textContent = mineV ? "나랑 찰떡 vs 상극 조합" : `${il[0]} ${c.mbti}의 찰떡 vs 상극`;
+  drawMatch(c);
+  $("cRx").dataset.k = (spicy ? "s_" : "c_") + c.id; $("cRx").dataset.g = `${il[0]} ${c.mbti}`;
+  $("memo").hidden = !mineV;
+  drawRx(); drawGrp(); drawBan();
+  $("sm").style.display = mineV ? "" : "none";
+  $("imgwrap").style.display = "none";
+  $("res").style.display = "block";
+  card.classList.remove("flip"); card.style.animation = "none"; card.offsetHeight; card.style.animation = ""; card.classList.add("flip");
+  $("res").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+// 누르기 반응 (ㅇㅈ / 이건 아님) — 저장 부분은 Store 하나만 바꾸면 다른 서버로 옮길 수 있게 분리
+const WHY = ["너무 과장", "나랑 반대", "재미없음"];
+const RX = {mine: {}, all: {}, note: "", mode: "local", uid: null, db: null, owner: false};
+try { const s = JSON.parse(localStorage.getItem("rx_v1") || "{}"); RX.mine = s.r || {}; RX.note = s.note || ""; } catch {}
+const saveLocal = () => { try { localStorage.setItem("rx_v1", JSON.stringify({r: RX.mine, note: RX.note})); } catch {} };
+const SB = "https://xemuxjhovqtjaeffujwv.supabase.co";
+const SBK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXV4amhvdnF0amFlZmZ1and2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3ODg3OTcsImV4cCI6MjExMDM2NDc5N30.xpNAiQqoXG7yQdCnfMQ3inn2o8lRM3qKVUwca98APWI";
+async function rpc(fn, body) {
+  const r = await fetch(`${SB}/rest/v1/rpc/${fn}`, {method: "POST", headers: {apikey: SBK, Authorization: "Bearer " + SBK, "Content-Type": "application/json"}, body: JSON.stringify(body || {}), keepalive: true});
+  if (!r.ok) throw new Error(fn + " " + r.status);
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+// 익명 방문자 번호 (기기마다 하나, 이름·연락처 없음)
+const UID = (() => { try { let u = localStorage.getItem("uid_v1"); if (!u) { u = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)).replace(/-/g, ""); localStorage.setItem("uid_v1", u); } return u; } catch { return "x" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2); } })();
+// 어디서 왔는지 (광고 링크 ?src=insta1 등). 처음 들어온 곳을 기억
+const SRC = (() => { const q = (new URLSearchParams(location.search).get("src") || "").replace(/[^\w-]/g, "").slice(0, 30); try { if (q) localStorage.setItem("src_v1", q); return q || localStorage.getItem("src_v1") || "direct"; } catch { return q || "direct"; } })();
+const sent = {};
+function track(name, combo) { if (sent[name]) return; sent[name] = 1; rpc("track", {p_name: name, p_src: SRC, p_combo: combo || "", p_sid: UID}).catch(() => {}); }
+RX.owner = new URLSearchParams(location.search).has("admin");
+const Store = {
+  busy: false, again: false, t: null,
+  async push() {
+    if (this.busy) { this.again = true; return; }
+    this.busy = true;
+    try { await rpc("rx_save", {p_uid: UID, p_r: RX.mine, p_note: RX.note, p_combo: mine ? mine.id : ""}); if (RX.mode !== "on") { RX.mode = "on"; } }
+    catch { RX.mode = "local"; drawRx(); }
+    this.busy = false;
+    if (this.again) { this.again = false; this.push(); return; }
+    clearTimeout(this.t); this.t = setTimeout(() => this.pull(), 800);
+  },
+  async pull() {
+    try {
+      const rows = await rpc("rx_stats");
+      const all = {}; (rows || []).forEach((v, i) => { if (v && v.r && typeof v.r === "object") all[i] = v; });
+      RX.all = all; RX.mode = "on"; RX.db = true;
+    } catch { if (RX.mode !== "on") RX.mode = "local"; }
+    drawRx();
+  },
+  async init() {
+    const t = setTimeout(() => { if (RX.mode === "local") { RX.mode = "slow"; drawRx(); } }, 10000);
+    await this.pull(); clearTimeout(t);
+    if (Object.keys(RX.mine).length || RX.note) this.push();
+    setInterval(() => { if (!document.hidden) this.pull(); }, 30000);
+    if (RX.owner) this.funnel();
+  },
+  async funnel() {
+    try { RX.ev = await rpc("ev_stats"); } catch { RX.ev = null; }
+    drawAdm();
+  }
+};
+function stat(k) {
+  let y = 0, n = 0; const w = {};
+  for (const id in RX.all) { const e = RX.all[id].r[k]; if (!e) continue;
+    if (e.v === "y") y++; else if (e.v === "n") { n++; if (WHY.includes(e.w)) w[e.w] = (w[e.w] || 0) + 1; } }
+  return {y, n, t: y + n, w};
+}
+const pText = (s, g) => !s.t ? "" : s.t < 5 ? `${g} 중 ${s.t}명이 눌렀고 ${s.y}명이 ㅇㅈ` : `${g} 중 ${Math.round(s.y / s.t * 100)}%가 ㅇㅈ (${s.t}명)`;
+function kLabel(k) {
+  const p = String(k).split("_"), il = IL[p[1]];
+  if (p[0] === "c" || p[0] === "s") return `${il ? il[0] : p[1]} ${p[2] || ""} ${p[0] === "s" ? "매운맛 " : ""}카드`;
+  const nm = p[0] === "i" ? (il ? il[0] : p[1]) : p[1];
+  return `${nm} · ${(SIT_T[p[2]] || p[2] || "").replace(/^\S+\s/, "")}`;
+}
+function rxText() {
+  const L = [`[사주×MBTI 반응] ${IL[mine.ilgan][0]} ${mine.mbti}`];
+  for (const k in RX.mine) { const e = RX.mine[k]; L.push(`${kLabel(k)}: ${e.v === "y" ? "ㅇㅈ" : "아님" + (e.w ? "(" + e.w + ")" : "")}`); }
+  if (RX.note) L.push("한 줄: " + RX.note);
+  return L.join("\n");
+}
+function drawRx() {
+  const me = !!(mine && cur && cur.id === mine.id);
+  document.querySelectorAll(".rx[data-k]").forEach(el => {
+    const k = el.dataset.k, m = RX.mine[k], s = stat(k), g = el.dataset.g || "";
+    let h = "";
+    if (me) {
+      const on = v => !!(m && m.v === v);
+      h += `<button type="button" data-v="y" class="${on("y") ? "on" : ""}" aria-pressed="${on("y")}">ㅇㅈ 완전 나임</button><button type="button" data-v="n" class="${on("n") ? "on" : ""}" aria-pressed="${on("n")}">이건 아님</button>`;
+      if (on("n")) h += `<div class="w">왜?${WHY.map(w => `<button type="button" data-w="${w}" class="${m.w === w ? "on" : ""}">${w}</button>`).join("")}</div>`;
+    }
+    const p = pText(s, g); if (p) h += `<div class="st">${esc(p)}</div>`;
+    el.innerHTML = h; el.style.display = h ? "" : "none";
+  });
+  const n = $("rxn");
+  n.style.display = me ? "flex" : "none";
+  if (me) {
+    const msg = RX.mode === "on" ? "문구마다 ㅇㅈ / 아님을 눌러주세요. 같은 조합 사람들 통계에 바로 반영돼요."
+      : RX.mode === "slow" ? "통계 불러오는 게 오래 걸려요. 누른 건 이 기기에 저장돼요."
+      : "문구마다 ㅇㅈ / 아님을 눌러주세요. 지금은 이 기기에만 저장돼요.";
+    n.innerHTML = `<span>${msg}</span>${RX.mode !== "on" && Object.keys(RX.mine).length ? `<button type="button">내 반응 복사</button>` : ""}`;
+  }
+  drawAdm();
+}
+function drawAdm() {
+  const a = $("adm");
+  a.hidden = !RX.owner; if (a.hidden) return;
+  const ks = {}; for (const id in RX.all) for (const k in RX.all[id].r) ks[k] = 1;
+  const rows = Object.keys(ks).map(k => [k, stat(k)]).filter(r => r[1].t).sort((x, y) => y[1].t - x[1].t);
+  const vd = s => { const p = Math.round(s.y / s.t * 100);
+    if (s.t < 20 && p < 70) return [`표 부족 ${s.t}/20 · ${p}%`, ""];
+    if (p >= 70) return [`유지 ${p}%`, "v-keep"];
+    if (p < 50) return [`교체 ${p}%`, "v-swap"];
+    return [`새 버전 테스트 ${p}%`, "v-ab"]; };
+  const EVN = {visit: "들어옴", result: "결과 봄", spicy: "매운맛", share_img: "공유 이미지", copy: "문구 복사", ask: "물어볼 문구", some: "썸 궁합", group: "단톡방 지도", report: "리포트 볼래요"};
+  const srcs = {}; (RX.ev || []).forEach(e => { (srcs[e.src] = srcs[e.src] || {})[e.name] = e.people; });
+  const SK = Object.keys(srcs);
+  const fun = SK.length ? `<p><b>어디서 와서 어디까지 갔나 (사람 수)</b></p><table><thead><tr><th>단계</th>${SK.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${Object.entries(EVN).map(([n, lb]) => `<tr><td>${lb}</td>${SK.map(k => `<td class="n">${srcs[k][n] || 0}</td>`).join("")}</tr>`).join("")}</tbody></table>` : "";
+  const notes = "";
+  $("admL").innerHTML = `<p>참여 ${Object.keys(RX.all).length}명 · 기준: ㅇㅈ 70% 이상 유지 / 20명 이상인데 50% 미만 교체 / 그 사이는 새 버전 테스트</p>`
+    + (rows.length ? `<table><thead><tr><th>문구</th><th>ㅇㅈ</th><th>아님</th><th>판정</th></tr></thead><tbody>${rows.map(([k, s]) => {
+      const [vt, vc] = vd(s), w = Object.entries(s.w).map(([a, b]) => `${a} ${b}`).join(", ");
+      return `<tr><td>${esc(kLabel(k))}${w ? `<br><small>${esc(w)}</small>` : ""}</td><td class="n">${s.y}</td><td class="n">${s.n}</td><td class="${vc}">${esc(vt)}</td></tr>`; }).join("")}</tbody></table>` : "<p>아직 반응이 없어요.</p>")
+    + fun + `<p><small>한 줄 남기기 내용은 Supabase → Table Editor → rx 표의 note 칸에서 봐요.</small></p>`;
+}
+$("res").addEventListener("click", e => {
+  const b = e.target.closest(".rx button"); if (!b || !mine || !cur || cur.id !== mine.id) return;
+  const k = b.closest(".rx").dataset.k; if (!k) return;
+  const m = RX.mine[k];
+  if (b.dataset.v) { if (m && m.v === b.dataset.v) delete RX.mine[k]; else RX.mine[k] = {v: b.dataset.v, t: Date.now()}; }
+  else if (b.dataset.w && m) { if (m.w === b.dataset.w) delete m.w; else m.w = b.dataset.w; }
+  saveLocal(); drawRx(); Store.push();
+});
+$("rxn").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b || !mine) return;
+  try { await navigator.clipboard.writeText(rxText()); b.textContent = "복사됨! 링크 보내준 사람한테 카톡으로"; }
+  catch { b.textContent = "복사 안 됨"; }
+  setTimeout(drawRx, 1800);
+});
+$("memoT").value = RX.note;
+$("memoB").addEventListener("click", () => {
+  RX.note = $("memoT").value.trim().slice(0, 200); saveLocal(); Store.push();
+  const b = $("memoB"); b.textContent = RX.mode === "on" ? "남겼어요!" : "이 기기에 저장했어요";
+  setTimeout(() => b.textContent = "남기기", 1600);
+});
+Store.init();
+track("visit");
+const EVB = {bImg: "share_img", bCopy: "copy", bAsk: "ask", bSpicy: "spicy", sGo: "some", bReport: "report"};
+document.addEventListener("click", e => { const b = e.target.closest("button[id]"); if (b && EVB[b.id]) track(EVB[b.id], mine ? mine.id : ""); }, true);
+$("bReport").addEventListener("click", () => { $("bReport").disabled = true; $("bReport").textContent = "볼래요 ✓"; $("rpMsg").hidden = false; });
+
+// 단톡방 조합 지도 — 릴레이 링크: 링크로 들어온 사람이 자기를 더한 새 링크를 단톡방에 다시 올림 (서버 없음)
+const BASE = location.origin + location.pathname;
+const BQ = [
+  ["약속 10분 전에 취소", "약속에 30분 지각"],
+  ["여행은 엑셀 일정표", "숙소만 잡고 즉흥 여행"],
+  ["단톡방 읽씹하는 친구", "답장 100개 보내는 친구"],
+  ["고민 말하면 해결책 주는 친구", "고민 말하면 같이 욕해주는 친구"],
+  ["생일에 깜짝 파티", "생일에 조용히 원하던 선물"],
+  ["싸우면 그 자리에서 바로 풀기", "싸우면 하루 지나고 풀기"],
+  ["주말엔 집에서 침대랑 한 몸", "주말엔 밖에서 약속 2개"],
+  ["웨이팅 1시간 맛집", "바로 들어가는 무난한 집"],
+  ["하루 종일 자주 톡", "저녁에 통화 한 번 길게"],
+  ["선물은 실용템", "선물은 감성템"],
+  ["팀플 무임승차자 이름 빼기", "팀플 그냥 내가 다 하고 넘어가기"],
+  ["지금 바로 받는 10만 원", "1년 뒤 받는 20만 원"],
+  ["팩폭하는 친구", "돌려 말하는 친구"],
+  ["길 잃으면 지도 앱", "길 잃으면 사람한테 물어보기"],
+  ["처음 보는 사람 많은 파티", "찐친 3명이랑 조용한 술자리"],
+  ["연애할 때 내가 더 좋아하기", "연애할 때 상대가 더 좋아하기"],
+  ["연봉 높고 야근 많은 회사", "연봉 낮고 칼퇴하는 회사"],
+  ["영화 결말 알고 보기", "영화 결말 절대 모르고 보기"],
+  ["알림 999+ 그냥 두기", "빨간 숫자 보이면 바로 지우기"],
+  ["다시 태어나면 지금 기억 그대로", "다시 태어나면 완전 새 인생"]
+];
+const MBS = COMBOS.slice(0, 16).map(c => c.mbti);
+const toHex = s => Array.from(new TextEncoder().encode(s), b => b.toString(16).padStart(2, "0")).join("");
+const fromHex = h => {
+  if (!/^([0-9a-f]{2})+$/.test(h)) return "";
+  try { return new TextDecoder("utf-8", {fatal: true}).decode(new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)))); } catch { return ""; }
+};
+let ROOM = null, joined = false, draftQ = null, ans = [], gName = "", skipHash = false, myName = "";
+function parseRoom(h) {
+  const p = String(h).replace(/^#/, "").split("-");
+  if (p[0] !== "g1" || !p[1] || (p[1].length !== 5 && p[1].length !== 6)) return null;
+  const q = [...p[1].slice(0, 5)].map(ch => parseInt(ch, 36)), part = p[1].length === 6 ? parseInt(p[1][5], 36) : 1;
+  if (!(part >= 1 && part < 36)) return null;
+  if (q.some(x => !(x >= 0 && x < BQ.length)) || new Set(q).size !== 5) return null;
+  const mem = [];
+  for (const t of p.slice(2, 32)) {
+    if (t.length < 5) continue;
+    const s = parseInt(t[0], 36), m = parseInt(t[1], 36), a = parseInt(t[2], 36), n = fromHex(t.slice(3)).slice(0, 10);
+    if (!(s >= 0 && s < 10) || !(m >= 0 && m < 16) || !(a >= 0 && a < 32) || !n.trim()) continue;
+    const c = MAP[STEMS[s] + "_" + MBS[m]];
+    if (c && !mem.some(x => x.n === n)) mem.push({n, c, a});
+  }
+  return mem.length ? {q, mem, part} : null;
+}
+const roomHash = r => "g1-" + r.q.map(x => x.toString(36)).join("") + (r.part > 1 ? r.part.toString(36) : "") +
+  r.mem.map(m => "-" + STEMS.indexOf(m.c.ilgan) + MBS.indexOf(m.c.mbti).toString(36) + m.a.toString(36) + toHex(m.n)).join("");
+const pickQ = () => {
+  const a = [...BQ.keys()];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a.slice(0, 5);
+};
+const bit = (m, k) => (m.a >> k) & 1;
+function mapHTML(r) {
+  const M = r.mem, n = M.length, pr = [];
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    let same = 0; for (let k = 0; k < 5; k++) same += bit(M[i], k) === bit(M[j], k) ? 1 : 0;
+    pr.push({i, j, p: rel(M[i].c, M[j].c).pct, same});
+  }
+  const k = Math.min(3, Math.max(1, Math.floor(pr.length / 2)));
+  const best = [...pr].sort((a, b) => b.p - a.p || b.same - a.same).slice(0, k);
+  const worst = [...pr].sort((a, b) => a.p - b.p || a.same - b.same).slice(0, k);
+  const big = n > 10, VH = big ? 340 : 290, cx = 170, cy = big ? 170 : 135, R = n === 1 ? 0 : big ? 148 : 100;
+  const pos = M.map((_, i) => { const t = i / n * 2 * Math.PI - Math.PI / 2; return [cx + R * Math.cos(t), cy + R * Math.sin(t)]; });
+  const lines = [], seen = new Set();
+  if (n >= 2) {
+    M.forEach((_, i) => {
+      const x = pr.filter(y => y.i === i || y.j === i).sort((a, b) => b.p - a.p)[0], key = x.i + "_" + x.j;
+      if (!seen.has(key)) { seen.add(key); lines.push([x, "#2b9a55", ""]); }
+    });
+    const w = worst[0];
+    if (!seen.has(w.i + "_" + w.j)) lines.push([w, "#d23f31", "6 5"]);
+  }
+  const f = v => v.toFixed(1);
+  const svg = `<svg class="gsvg" viewBox="0 0 340 ${VH}" role="img" aria-label="단톡방 조합 관계도">` +
+    lines.map(([x, c, d]) => `<line x1="${f(pos[x.i][0])}" y1="${f(pos[x.i][1])}" x2="${f(pos[x.j][0])}" y2="${f(pos[x.j][1])}" stroke="${c}" stroke-width="3" stroke-linecap="round"${d ? ` stroke-dasharray="${d}"` : ""}/>`).join("") +
+    M.map((m, i) => {
+      const il = IL[m.c.ilgan], [x, y] = pos[i];
+      if (big) return `<circle cx="${f(x)}" cy="${f(y)}" r="11" fill="${il[3]}"/><text x="${f(x)}" y="${f(y + 4)}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${i + 1}</text>`;
+      return `<circle cx="${f(x)}" cy="${f(y)}" r="19" fill="${il[3]}"/><text x="${f(x)}" y="${f(y + 6)}" text-anchor="middle" font-size="17" font-weight="900" fill="#fff">${il[1]}</text>` +
+        `<text x="${f(x)}" y="${f(y + 36)}" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor" stroke="var(--panel)" stroke-width="4" paint-order="stroke">${esc(m.n)}</text>` +
+        `<text x="${f(x)}" y="${f(y + 50)}" text-anchor="middle" font-size="10" fill="currentColor" stroke="var(--panel)" stroke-width="3" paint-order="stroke">${il[0]} ${m.c.mbti}</text>`;
+    }).join("") + `</svg>`;
+  const who = m => `${IL[m.c.ilgan][0]} ${m.c.mbti}`;
+  const pl = (x, good) => `<li style="--z:${good ? "#2b9a55" : "#d23f31"}"><b>${esc(M[x.i].n)} × ${esc(M[x.j].n)} · ${x.p}%</b><br><span>${who(M[x.i])} × ${who(M[x.j])} · 밸런스 답 ${x.same}/5 같음</span></li>`;
+  const bal = r.q.map((x, k) => {
+    const A = M.filter(m => !bit(m, k)), B = M.filter(m => bit(m, k)), pa = Math.round(A.length / n * 100);
+    return `<div class="gb"><p>${esc(BQ[x][0])} vs ${esc(BQ[x][1])}</p><div class="gbar">` +
+      (A.length ? `<span style="width:${pa}%;background:#2f6a9e">${A.length}</span>` : "") +
+      (B.length ? `<span style="width:${100 - pa}%;background:#d2573e">${B.length}</span>` : "") +
+      `</div><small><i class="dot" style="background:#2f6a9e"></i>${esc(BQ[x][0])}: ${A.map(m => esc(m.n)).join(", ") || "없음"}</small><small><i class="dot" style="background:#d2573e"></i>${esc(BQ[x][1])}: ${B.map(m => esc(m.n)).join(", ") || "없음"}</small></div>`;
+  }).join("");
+  let h = `<p class="gh">${esc(M[0].n)}님이 시작한 지도${r.part > 1 ? ` ${r.part}번` : ""} · ${n}명 참여${n >= 30 ? " (꽉 참)" : ""}</p>${svg}` +
+    (big ? `<div class="glg">${M.map((m, i) => `<span><i style="background:${IL[m.c.ilgan][3]}">${i + 1}</i>${esc(m.n)} <small>${IL[m.c.ilgan][0]} ${m.c.mbti}</small></span>`).join("")}</div>` : "");
+  if (n === 1) h += `<p class="gs">친구가 들어오면 선이 그려져요. 초록 선 = 서로 제일 잘 맞는 짝, 빨간 점선 = 우리 방 최대 상극</p>`;
+  else {
+    h += `<p class="gs">초록 선 = 각자 제일 잘 맞는 짝 · 빨간 점선 = 우리 방 최대 상극</p>`;
+    h += n === 2 ? `<h3>우리 둘 궁합</h3><ul class="gp">${pl(pr[0], pr[0].p >= 60)}</ul>`
+      : `<h3>우리 방 찰떡</h3><ul class="gp">${best.map(x => pl(x, true)).join("")}</ul><h3>우리 방 상극</h3><ul class="gp">${worst.map(x => pl(x, false)).join("")}</ul>`;
+  }
+  let sim = "";
+  const mi = M.findIndex(m => m.n === myName);
+  if (mi >= 0 && n >= 2) {
+    const o = pr.filter(x => x.i === mi || x.j === mi).sort((a, b) => b.same - a.same)[0], oi = o.i === mi ? o.j : o.i;
+    sim = `<p class="gs">나랑 답이 제일 비슷한 사람: ${esc(M[oi].n)} (${o.same}/5 같음)</p>`;
+  }
+  return [h, sim + bal];
+}
+function drawBan() {
+  const b = $("gban");
+  if (!ROOM) { b.hidden = true; return; }
+  b.hidden = false;
+  b.innerHTML = `<b>${esc(ROOM.mem[0].n)}님의 단톡방 조합 지도${ROOM.part > 1 ? ` ${ROOM.part}번` : ""}</b><p>${ROOM.mem.length}명 참여 중: ${ROOM.mem.map(m => esc(m.n)).join(", ")}</p>` +
+    `<p class="s">${ROOM.mem.length >= 30 ? "이 지도는 30명이 꽉 찼어요. 결과를 보면 같은 문제로 다음 번 지도를 만들 수 있어요." : "생일·MBTI 넣고 결과를 보면 나도 지도에 들어갈 수 있어요."}</p><button type="button">${mine ? "지도 보러 가기" : "나도 참여하기"}</button>`;
+}
+function drawGrp() {
+  const g = $("grp"), me = !!(mine && cur && cur.id === mine.id);
+  g.style.display = me ? "" : "none";
+  if (!me) return;
+  let h = `<h2>단톡방 조합 지도</h2>`;
+  let bal = "";
+  if (ROOM) { const [mh, bh] = mapHTML(ROOM); h += mh; bal = bh; }
+  const full = !!(ROOM && ROOM.mem.length >= 30 && !ROOM.mem.some(m => m.n === gName.trim()));
+  if (!joined) {
+    const q = ROOM ? ROOM.q : (draftQ = draftQ || pickQ());
+    h += `<p style="margin-top:14px">${full ? `이 지도는 30명이 꽉 찼어요. 같은 5문제로 ${(ROOM.part || 1) + 1}번 지도를 만들어서 나머지 친구들을 모아요. 새 링크를 단톡방에 올리면 돼요.` : ROOM ? "밸런스게임 5문제 풀고 지도에 들어가세요. 들어가면 내가 추가된 새 링크가 생겨요." : "링크를 단톡방에 올리면 친구들이 하나씩 들어와서 우리 방 찰떡·상극 지도가 그려져요. 밸런스게임 5문제도 같이 풀어요."}</p>` +
+      `<label class="t" for="gName">단톡방에서 부르는 이름</label><input class="gn" id="gName" maxlength="8" placeholder="예: 구구" value="${esc(gName)}">` +
+      q.map((x, i) => `<div class="gq"><p>Q${i + 1}. 둘 중 하나만 고른다면?</p><div class="ab">${[0, 1].map(k => `<button type="button" data-q="${i}" data-k="${k}" class="${ans[i] === k ? "on" : ""}" aria-pressed="${ans[i] === k}">${esc(BQ[x][k])}</button>`).join("")}</div></div>`).join("") +
+      `<button class="go" type="button" id="gJoin">${full ? `${(ROOM.part || 1) + 1}번 지도 만들기` : ROOM ? "지도에 나 넣기" : "지도 만들기"}</button><p class="err" id="gErr" role="alert"></p>`;
+  } else {
+    h += `<div class="gsh"><p>나까지 들어간 새 링크예요. 단톡방에 다시 올려주세요.</p><input class="gn" readonly id="gLink" value="${esc(BASE + "#" + roomHash(ROOM))}">` +
+      `<div class="acts" style="grid-template-columns:repeat(2,minmax(0,1fr))"><button type="button" id="gCopy">링크 복사</button><button type="button" id="gMsg">단톡방 문구 복사</button></div></div>`;
+  }
+  g.innerHTML = h + (bal ? `<div class="balsec"><h2>우리 방 밸런스게임</h2><p>같은 5문제에 다들 뭘 골랐는지 모아봤어요.</p>${bal}</div>` : "");
+}
+$("grp").addEventListener("input", e => { if (e.target.id === "gName") gName = e.target.value; });
+$("grp").addEventListener("click", async e => {
+  if (e.target.closest("button")) track("group", mine ? mine.id : "");
+  const b = e.target.closest("button"); if (!b || !mine) return;
+  if (b.dataset.q !== undefined) {
+    ans[+b.dataset.q] = +b.dataset.k;
+    b.parentNode.querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); });
+    return;
+  }
+  if (b.id === "gJoin") {
+    const err = t => { $("gErr").textContent = t; };
+    const nm = gName.trim().replace(/\s+/g, " ");
+    if (!nm) return err("이름을 넣어주세요.");
+    if ([0, 1, 2, 3, 4].some(i => ans[i] === undefined)) return err("5문제 다 골라주세요.");
+    const a = [0, 1, 2, 3, 4].reduce((s, i) => s | (ans[i] << i), 0);
+    if (!ROOM) ROOM = {q: draftQ, mem: []};
+    const at = ROOM.mem.findIndex(m => m.n === nm);
+    if (at < 0 && ROOM.mem.length >= 30) ROOM = {q: ROOM.q, part: (ROOM.part || 1) + 1, mem: []};
+    myName = nm;
+    if (at >= 0) ROOM.mem[at] = {n: nm, c: mine, a}; else ROOM.mem.push({n: nm, c: mine, a});
+    joined = true; skipHash = true;
+    try { location.hash = roomHash(ROOM); } catch {}
+    drawBan(); drawGrp();
+    $("grp").scrollIntoView({behavior: RM ? "auto" : "smooth", block: "start"});
+    return;
+  }
+  if (b.id === "gCopy" || b.id === "gMsg") {
+    const link = BASE + "#" + roomHash(ROOM), old = b.textContent;
+    const txt = b.id === "gCopy" ? link : `우리 단톡방 사주×MBTI 조합 지도 (${ROOM.mem.length}명)\n생일·MBTI 넣고 너까지 들어간 새 링크를 여기 다시 올려줘!\n${link}`;
+    try { await navigator.clipboard.writeText(txt); b.textContent = "복사됨!"; } catch { b.textContent = "복사 안 됨"; }
+    setTimeout(() => b.textContent = old, 1500);
+  }
+});
+$("gban").addEventListener("click", e => {
+  if (!e.target.closest("button")) return;
+  if (mine) { show(mine); setTimeout(() => $("grp").scrollIntoView({behavior: RM ? "auto" : "smooth", block: "start"}), 50); }
+  else { $("f").scrollIntoView({behavior: RM ? "auto" : "smooth", block: "start"}); $("bd").focus({preventScroll: true}); }
+});
+addEventListener("hashchange", () => {
+  if (skipHash) { skipHash = false; return; }
+  const r = parseRoom(location.hash);
+  if (r) { ROOM = r; joined = false; ans = []; drawBan(); drawGrp(); }
+});
+ROOM = parseRoom(location.hash || "");
+drawBan();
+
+// 썸 상대 궁합 — 생일·MBTI 중 모르는 건 '모름'으로 두면 가능한 조합을 다 계산해서 범위로 보여줌
+const sPick = ["?", "?", "?", "?"];
+const drawSmb = () => {
+  $("sMb").innerHTML = PAIRS.map((p, i) => `<div>${[...p, "?"].map(l => `<button type="button" data-i="${i}" data-l="${l}" class="${sPick[i] === l ? "on" : ""}" aria-pressed="${sPick[i] === l}">${l === "?" ? "모름" : l}<small>${l === "?" ? "&nbsp;" : NAMES[l]}</small></button>`).join("")}</div>`).join("");
+};
+drawSmb();
+$("sMb").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; sPick[+b.dataset.i] = b.dataset.l; drawSmb(); });
+$("sNo").addEventListener("change", () => { $("sBd").disabled = $("sNo").checked; });
+$("sGo").addEventListener("click", () => {
+  if (!mine) return;
+  const err = t => { $("sErr").textContent = t; };
+  let stems = STEMS;
+  if (!$("sNo").checked) {
+    const v = $("sBd").value;
+    if (!v) return err("생일을 넣거나 '생일 모름'에 체크해 주세요.");
+    const [y, m, d] = v.split("-").map(Number);
+    if (y < 1920 || y > 2025) return err("1920~2025년 사이로 넣어주세요.");
+    stems = [dayStem(y, m, d, $("sLate").checked)];
+  }
+  const mbs = MBS.filter(x => [...x].every((ch, i) => sPick[i] === "?" || sPick[i] === ch));
+  if (stems.length === 10 && mbs.length === 16) return err("생일이나 MBTI 중 하나는 알아야 해요.");
+  err("");
+  const rs = [];
+  stems.forEach(s => mbs.forEach(mb => { const c = MAP[s + "_" + mb]; if (c) rs.push(rel(mine, c)); }));
+  rs.sort((a, b) => b.pct - a.pct || b.ss - a.ss);
+  const hi = rs[0], lo = rs[rs.length - 1], lab = r => `${IL[r.c.ilgan][0]} ${r.c.mbti}`;
+  let h = `<div class="sres">`;
+  if (rs.length === 1) {
+    const ws = [hi.st, ...hi.good.map(x => "+ " + x), ...hi.bad.map(x => "− " + x)];
+    h += `<p class="sl">상대는 ${lab(hi)} · ${esc(hi.c.mild.nickname)}</p><p class="sp">${hi.pct}%</p>` +
+      `<ul class="why" style="--c:var(--el)">${ws.map(w => `<li>${esc(w)}</li>`).join("")}</ul>` +
+      `<button type="button" class="ask" data-id="${hi.c.id}">상대 조합 결과 보기</button>`;
+  } else {
+    const byStem = stems.length > 1;
+    const rows = (byStem ? stems.map(s => [IL[s][0], rs.filter(r => r.c.ilgan === s)]) : mbs.map(mb => [mb, rs.filter(r => r.c.mbti === mb)]))
+      .filter(g => g[1].length).map(([n, a]) => ({n, mx: a[0], mn: a[a.length - 1]})).sort((a, b) => b.mx.pct - a.mx.pct);
+    h += `<p class="sl">가능한 조합 ${rs.length}개 기준</p><p class="sp">${lo.pct === hi.pct ? hi.pct : lo.pct + "~" + hi.pct}%</p>` +
+      `<div class="shl"><button type="button" class="sbx g" data-id="${hi.c.id}">제일 높을 때<b>${lab(hi)} ${hi.pct}%</b><small>${esc(hi.st)}</small></button>` +
+      `<button type="button" class="sbx r" data-id="${lo.c.id}">제일 낮을 때<b>${lab(lo)} ${lo.pct}%</b><small>${esc(lo.st)}</small></button></div>` +
+      `<p class="sl" style="margin-top:14px">${byStem ? "상대 일간별로 보면" : "상대 MBTI별로 보면"}</p>` +
+      rows.map(r => `<button type="button" class="srow" data-id="${r.mx.c.id}"><span>${esc(r.n)}</span><span class="sbar"><i style="width:${r.mx.pct}%"></i></span><span class="sv">${r.mn.pct === r.mx.pct ? r.mx.pct : r.mn.pct + "~" + r.mx.pct}%</span></button>`).join("") +
+      `<p class="gs">${byStem ? "생일을 알면 이 중 한 줄로 좁혀져요." : "MBTI를 더 알면 범위가 좁혀져요."} 줄을 누르면 그 조합 결과를 볼 수 있어요.</p>`;
+  }
+  $("sOut").innerHTML = h + `</div>`;
+});
+$("sOut").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b && MAP[b.dataset.id]) show(MAP[b.dataset.id]); });
+
+// 매운맛 (버튼 눌렀을 때만) — 별명·한 줄 요약·킹받는 포인트·짤 문구만 바뀜
+const SP = {"gap_ISTJ":["인간 철근콘크리트","틀린 거 알면서 계획표가 맞다고 끝까지 우기는 사람","\"원래 이렇게 하는 거야\"가 논리의 전부. 근거 물어보면 \"원래\"","제 고집은 A/S 기간 끝났습니다. 반품 불가"],"gap_ISFJ":["생색 적립 포인트 카드","다 해준 다음 3년 뒤에 한꺼번에 생색 청구함","\"괜찮아 내가 할게\" 해놓고 표정으로 시위 중","희생은 내가 함. 대신 평생 기억함"],"gap_INFJ":["무통보 손절 전문가","이해하는 척 웃다가 어느 날 연락처에서 증발함","\"왜 그래?\" 물으면 \"몰라서 묻는 거야?\"로 2차 가격","경고는 없음. 차단은 있음"],"gap_INTJ":["답정너 독재자","의견 물어보는 척 결론은 어제 이미 냄","\"다들 어떻게 생각해?\" 하고 반대하면 설득 3시간","투표는 형식. 결과는 나"],"gap_ISTP":["말 대신 읽씹하는 통나무","지적하면 대답 대신 '읽음'으로 응수","\"됐지?\" 세 글자로 모든 대화 강제 종료","해명은 안 함. 너가 알아서 이해해"],"gap_ISFP":["이불 속 대장님","리더 하고 싶은데 침대 밖이 무서움","\"내가 정할게!\" 하고 마감 3일 지나서 정함","앞장설게. 일어나면. 아마도. 내일"],"gap_INFP":["삐짐 장기 계약자","조언 한마디에 3일 삐지고 결국 하나도 안 바뀜","반박문을 머릿속으로 47번 쓰고 실제론 \"응…\"","꺾이진 않음. 대신 오래 시무룩함"],"gap_INTP":["인간 팩트체크 봇","친구가 울어도 \"근데 그건 사실 아님\"부터 함","대화 80%를 \"근데 그건 틀렸어\"로 시작","감정이요? 출처 가져오세요"],"gap_ESTP":["브레이크 고장 난 덤프트럭","생각은 사고 친 다음에 함","\"일단 해보자\"로 시작해서 수습은 늘 남이 함","후진 기능 없음. 사과 기능도 없음"],"gap_ESFP":["무대 강탈범","남의 생일파티에서 주인공보다 더 튐","주인공 자리 아니면 표정에 '재미없음' 자막 뜸","오늘 주인공 나 아니면 안 감"],"gap_ENFP":["사업계획서 수집가","\"이번엔 진짜야\"를 올해만 23번 함","시작은 갑목처럼 웅장하게, 끝은 ENFP처럼 흐지부지","사업계획서 7개 보유. 사업자등록 0개"],"gap_ENTP":["토론장 민폐왕","질 것 같으면 주제를 바꿔서라도 이김","지면 \"아니 그게 아니라~\"로 3라운드 시작","진 적 없음. 인정한 적이 없을 뿐"],"gap_ESTJ":["답정너 사내 규정집","의견 물어보는 척 이미 결재 끝난 사람. 본인이 꼰대인 줄 모르는 게 핵심","여행 가서도 \"몇 시까지 집합, 늦으면 두고 감\" 공지","나 때는 말이야 (20대임)"],"gap_ESFJ":["강제 행복 배달부","다 같이 행복해야 함. 단, 내가 정한 방식으로","챙겨주고 리액션 약하면 서운함 장부에 바로 기입","고맙다는 말 아직 못 들었는데요?"],"gap_ENFJ":["원치 않는 인생 컨설턴트","고민 하나 말하면 인생 계획서 10장이 돌아옴","\"너를 위해서\"로 시작해서 잔소리로 끝남","네 인생은 내가 더 잘 앎. 따라와"],"gap_ENTJ":["우정 KPI 관리자","친구 사이에도 성과평가가 있음","생일파티 끝나고 \"다음엔 이렇게 하자\" 피드백 회의","못 따라오면 두고 감. 진심임"],"eul_ISTJ":["웃는 얼굴의 고집 덩어리","\"응 그래~\" 해놓고 결국 원래 계획대로 함","동의한 척 다 듣고 리스트에 없으면 안 함","유연합니다. 엑셀 안에서만"],"eul_ISFJ":["거절 기능 고장 난 인간 비서","부탁받으면 웃으며 수락, 집 가서 울면서 처리함","\"괜찮아~\"가 입버릇인데 하나도 안 괜찮음","제 시간은 공공재입니다 (아님)"],"eul_INFJ":["미소 손절 전문가","어제까지 웃던 사람이 오늘 연락처에 없음","티 안 내고 서서히 멀어지기 1급 자격증 보유","이별 통보는 없음. 그냥 증발함"],"eul_INTJ":["져주는 척 사기꾼","양보하는 줄 알았는데 처음부터 다 계획이었음","\"네 말이 맞아~\" 하고 결국 내 안으로 끌고 감","님이 이긴 줄 알죠? 귀엽네요"],"eul_ISTP":["연락두절 생존왕","힘들어도 말 안 하다가 다 끝나고 \"ㅇㅇ 해결함\"","걱정해주면 \"왜?\" 한마디로 대화 차단","도움 요청은 제 사전에 없음. 연락도 없음"],"eul_ISFP":["\"아무거나\" 사기단","아무거나 괜찮다면서 추천 메뉴 전부 거절함","웃으면서 결국 100% 내 취향대로 정함","아무거나 = 내가 정한 아무거나"],"eul_INFP":["셀프 서운함 제조공장","아무 일 없었는데 혼자 서운하고 혼자 화해함","상대는 모르는 냉전을 3일째 진행 중","우리 싸웠어? (나 혼자)"],"eul_INTP":["분위기 파괴 분석가","눈치는 다 챙겨놓고 대답은 논리로 함","다들 웃을 때 \"근데 그거 사실 아님\" 투척","눈치 있음. 사용 안 함"],"eul_ESTP":["어디서든 빌붙는 생존왕","낯선 곳에서도 3분 만에 밥 얻어먹음","길 잃어도 현지 친구 사귀어서 귀환함","생존력 바퀴벌레급 (칭찬임)"],"eul_ESFP":["막차 거부 인싸","\"딱 한 잔만\"이 새벽 4시가 되는 마법사","다음 날 기억은 없는데 친구는 3명 늘어남","체력은 덩굴, 통장은 낙엽"],"eul_ENFP":["문어발 약속 펑크왕","모임 5개 동시 진행, 그중 2개는 까먹음","\"우리 언제 봐~\"가 인사말이자 거짓말","친구는 많음. 약속 지킨 적은 적음"],"eul_ENTP":["\"맞아맞아 근데\" 장인","동의하는 척 정반대 결론을 냄","웃으면서 반박해서 화도 못 내게 함","맞아맞아~ (아님)"],"eul_ESTJ":["미소 장착 잔소리 머신","부드러운 말투로 사람 숨 막히게 함","\"편할 때 해~ 근데 오늘까지\"","부드럽게 말할 때 하세요 ^^"],"eul_ESFJ":["단톡방 감시 CCTV","읽씹한 사람 명단 머릿속에 다 있음","다 맞춰주다가 한 번 터지면 연대기 공개","서운한 일 한정 기억력 무한대"],"eul_ENFJ":["강제 소개팅 브로커","\"너네 잘 맞을 것 같아\"는 이미 약속 잡았다는 뜻","남의 연애에 기획 회의 소집","자만추? 아니 내만추 (내가 만든 추천)"],"eul_ENTJ":["웃으며 다 먹는 정복자","적은 안 만들면서 자리는 다 차지함","아무도 모르게 팀장 자리에 앉아 있음","천천히, 웃으면서, 다 가져감"],"byeong_ISTJ":["예약제 텐션","신나는 것도 미리 공지해야 함","약속 바뀌면 \"괜찮아!\" 얼굴은 재난 문자","즉흥은 사절. 텐션은 1주 전 예약"],"byeong_ISFJ":["오지랖 무료 배송","남 고민 해결하다 내 인생은 내일로 미룸","\"내가 도와줄게\"가 거의 반사신경","저는 괜찮아요 (안 괜찮은 거 다 보임)"],"byeong_INFJ":["비공개 실패 계정","속마음 숨기려는데 얼굴이 생방송 중","\"나 안 서운해\"를 서운한 얼굴로 말함","비밀 유지 능력: 표정 때문에 0점"],"byeong_INTJ":["자칭 내향인 관종","혼자 있고 싶다면서 모임에서 제일 시끄러움","\"사람 피곤해\" 해놓고 2차 노래방 주도","내향인입니다 (아무도 안 믿음)"],"byeong_ISTP":["on/off만 있는 태양","신나면 100마디, 안 신나면 \"ㅇ\"","관심 없는 대화엔 영혼 출장 보냄","밝기 조절 기능 없음. 꺼지면 끝"],"byeong_ISFP":["배터리 2시간짜리 태양","\"오늘 대박 신나!\" 2시간 뒤 \"집 갈래\"","약속 잡을 땐 신나고 당일엔 취소 각 잼","충전은 침대에서만 됨"],"byeong_INFP":["위로하러 가서 위로받는 사람","남의 이별에 본인이 더 오열함","친구 고민 듣다 자기가 3일 앓아누움","네 얘기 듣다 내가 무너짐 (미안)"],"byeong_INTP":["열정적 팩폭 발표자","위로 대신 원인 분석 PPT를 열정적으로 발표함","\"힘들어\"에 \"왜 힘든지 3가지로 정리해볼까?\"","공감은 못 해도 분석은 뜨겁게 해줌"],"byeong_ESTP":["밤 11시 바다 납치범","\"지금 바다 갈 사람?\"이 농담 아님","계획 없이 출발해서 계획 없이 사고 침","일단 출발. 후회는 고속도로에서"],"byeong_ESFP":["오늘만 사는 카드 긁개","기분 좋으면 다 쏘고 다음 달은 라면","인스타 스토리 하루 30개, 다 내 얼굴","오늘 계산 내가! (다음 달의 나 미안)"],"byeong_ENFP":["전원 버튼 없는 관종 스피커","같이 있으면 재밌는데 1시간 지나면 귀에서 피 남","시작한 일 100개, 끝낸 일 2개. 그 2개도 남이 마무리함","작심삼일? 난 작심세시간"],"byeong_ENTP":["시비 걸고 밥 먹자는 사람","열 내며 반박하고 5분 뒤 \"배고프다 밥 먹자\"","상대는 아직 화났는데 본인은 다 까먹음","뒤끝 없음 (상대한테 뒤끝 남김)"],"byeong_ESTJ":["남의 팀까지 관리하는 반장","오지랖에 관리력까지 붙어서 업무 범위 무한대","\"내 일 아닌데 그냥 내가 할게\" 하고 잔소리 3세트","도와준 건데 왜 다들 피곤해함?"],"byeong_ESFJ":["읽씹 감지 레이더","답장 10분 늦으면 \"무슨 일 있어?\" 5통","단톡방 텐션 혼자 멱살 잡고 끌고 가는 중","다들 밥 먹었어?? 왜 답 없어???"],"byeong_ENFJ":["거절 불가 응원단장","부탁 안 했는데 응원받는 중","하기 싫은 일에도 \"넌 할 수 있어!!\" 외침","응원 중!! 수신거부 불가!!"],"byeong_ENTJ":["표정에 다 적힌 사장님","답답하면 회의 중 얼굴에 '무능' 자막 뜸","칭찬도 화내는 톤으로 함","해 뜨면 일함. 해는 안 짐. 퇴근도 없음"],"jeong_ISTJ":["분 단위 원한 기록관","\"괜찮아\" 해놓고 7분 지각을 평생 기억함","규칙 어긴 날짜·시간·장소 다 저장해 둠","늦어도 괜찮아 (19시 07분 도착 기록함)"],"jeong_ISFJ":["서운함 USB 무제한 용량","5년 전 그 말 토씨 하나 안 틀리고 재생 가능","\"아니 괜찮아~\" 하고 메모장에 저장","다 기억함. 고마운 것도, 괘씸한 것도"],"jeong_INFJ":["웃으며 차단하는 사람","\"괜찮아\" 하고 그날 밤 조용히 차단 버튼","잊은 척 연기하면서 영원히 기억함","불은 꺼졌습니다. 재점화 불가"],"jeong_INTJ":["새벽 3시 집착러","\"관심 없어\" 해놓고 새벽까지 파고 있음","관심 없는 척 연기 실력은 최하, 몰입은 최강","관심 없다니까요 (새벽 3시 접속 중)"],"jeong_ISTP":["본인도 모르는 분노","화났냐고 물으면 \"아니\" 근데 반쯤 화남","자기 감정 파악하는 데 3일 걸림","화났는지 나도 모름. 일단 말 걸지 마"],"jeong_ISFP":["무드등 은둔자","약속은 귀찮은데 막상 만나면 제일 늦게 감","감성 플리 만들다 새벽 2시, 다음 날 지각","침대 밖은 위험해 (무드등 켜는 중)"],"jeong_INFP":["우울 콘텐츠 정기 구독자","슬플 일이 없으면 만들어서라도 곱씹음","3년 전 그 말로 아직 시즌 3 집필 중","그때 그 말, 아직 활활 타는 중"],"jeong_INTP":["논리적으로 서운한 사람","서운함을 근거 3개 붙여서 설명함","감정을 엑셀로 정리해서 보냄. 표까지 있음","서운함 (첨부파일 3개)"],"jeong_ESTP":["장난 다 적어두는 불꽃","같이 깔깔 놀아놓고 그때 한 말 나중에 꺼냄","웃으면서 속으로 메모하는 무서운 사람","불붙으면 못 끔. 기억도 못 지움"],"jeong_ESFP":["파티 후 혼자 반성회","제일 신나게 놀고 집 가서 \"나 말실수했나?\"","귀갓길 리플레이 2시간, 이불킥 3회","파티 끝. 이제 혼자 반성 시간"],"jeong_ENFP":["느낌표 개수로 아픈 사람","\"괜찮아!!!\" 느낌표 많을수록 안 괜찮음","하루에 감정 롤러코스터 5회 탑승","괜찮아!!!! (느낌표 세지 마)"],"jeong_ENTP":["내 장난만 까먹는 사람","내가 한 장난은 잊고 남이 한 장난은 3달 보관","이긴 건 잊고 진 건 복수 준비","토론 종료. 앙금 보관 중"],"jeong_ESTJ":["서운함 섞인 잔소리 칵테일","잔소리 70%에 서운함 30% 섞어서 제공","\"괜찮아, 근데 다음부턴\" 무한 반복","괜찮음. 다음부터 지켜주세요. (최종 경고)"],"jeong_ESFJ":["이모티콘 감정 측정기","서운하면 이모티콘 개수부터 줄어듦","읽씹 한 번에 3일 동안 말투 건조해짐","괜찮아 (이모티콘 0개 = 위험)"],"jeong_ENFJ":["방전된 응원봉","본인 방전 직전인데 남 걱정 중","쓰러지기 직전에 \"넌 괜찮아?\" 물어봄","너 먼저 챙길게. 나는... 나중에"],"jeong_ENTJ":["실수 회의록 저장소","\"괜찮아, 다음엔 잘하자\" (평생 기억함)","남의 실수를 연도별로 정리해 둠","용서는 함. 망각은 안 함"],"mu_ISTJ":["움직이지 않는 산","급한 일도 원래 순서대로 천천히 처리함","\"원래 이렇게 해왔잖아\"로 모든 혁신 차단","변화요? 산은 안 움직입니다"],"mu_ISFJ":["본인 고민 매장 전문가","남 고민 다 들어주고 자기 얘기는 산에 묻음","\"난 괜찮아\"가 10년째 업데이트 안 됨","상담은 무료. 제 고민은 비공개"],"mu_INFJ":["입산 통제구역","다 받아주다가 어느 날 출입금지 팻말 세움","이유 물어도 끝까지 대답 안 함","등산로 폐쇄. 재개방 일정 없음"],"mu_INTJ":["일주일 뒤 답장러","답장이 느린 게 아니라 결론 내는 중이라고 주장","일주일 만에 온 답장이 \"ㅇㅋ\"","답장 늦은 거 아님. 계산 중이었음"],"mu_ISTP":["봉화 수준 연락망","3시간 고민한 답장이 \"ㅇ\"","위기엔 최강, 평소엔 생사 확인 불가","ㅇ (최선을 다한 답장)"],"mu_ISFP":["이불 덮은 산","\"나가자\" 해놓고 3시간째 누워서 준비 중","외출 준비가 자연스럽게 취침 준비로 바뀜","산은 원래 안 움직임. 나도"],"mu_INFP":["겉은 평온 속은 태풍","상처받아도 표정 변화 0이라 아무도 모름","혼자 3일 앓고 \"아 그거? 괜찮아\"","멀쩡해 보이지? 속은 태풍 경보"],"mu_INTP":["느린 데다 분석까지 하는 사람","고민 들어주다가 원인 분석 들어감","답장은 느린데 내용은 논문","듣고 있음. 분석도 하고 있음. 답장은 내일"],"mu_ESTP":["몇 달 자다 터지는 휴화산","조용하다가 갑자기 \"내일 제주도 가자\"","움직이면 지진, 안 움직이면 석상","움직이면 지진 (예고 없음)"],"mu_ESFP":["\"다음에 놀자\" 계절 단위","\"오늘 놀자\"가 실현되는 데 한 계절 걸림","\"다음에 보자\"가 진짜 다음 계절","축제 예정 (날짜 미정, 연도 미정)"],"mu_ENFP":["아이디어 숙성 창고","\"대박 아이디어 있어\"가 3년째 숙성 중","기획서 100개, 착공 0개","숙성 중인 아이디어 87개 (와인 아님)"],"mu_ENTP":["꿈쩍 않는 약 올리기 장인","흔들림 없이 반박해서 상대가 먼저 지침","상대가 화내면 \"왜 그렇게 흥분해?\"","난 안 흔들림. 너만 흔들림"],"mu_ESTJ":["변화 거부 관리소장","규칙 바꾸자 하면 \"그동안 잘해왔잖아\"","10년 된 방식 아직도 고집 중","이 조직은 내가 받치고 있음 (그래서 안 바뀜)"],"mu_ESFJ":["남 고민 즉답, 내 답장 반나절","남 걱정은 1초, 본인 연락은 반나절","\"나 뭐 잘못했나?\" 걱정을 본인이 제조함","다들 힘들면 산으로 와 (답장은 느림)"],"mu_ENFJ":["1시간짜리 인생 상담소","고민 1개 말했더니 인생 전체 리뷰받음","짧게 끝나는 상담이 존재하지 않음","넌 할 수 있어 (근데 1시간 들어야 함)"],"mu_ENTJ":["느긋한 척 다 먹은 사람","천천히 하는 줄 알았는데 이미 다 장악함","\"급할 거 없어\"의 진짜 뜻은 \"이미 끝났어\"","움직이면 지진. 이미 움직였음"],"gi_ISTJ":["플랜 Z까지 있는 걱정왕","\"혹시 몰라\"가 인생 철학","여행 가방 절반이 비상용품. 쓴 적은 없음","만약을 대비했음 (만약이 87개)"],"gi_ISFJ":["\"밥 먹었어?\" 알림봇","\"밥은?\" 하루 세 번 정기 발송","챙겨주고 혼자 지쳐서 혼자 섭섭함","밥은 먹고 다니냐 (오늘 3번째)"],"gi_INFJ":["남의 고민 대리 걱정러","상담해주고 집 가서 그 사람 걱정으로 밤샘","내 고민은 산더미인데 남 거부터 처리함","네 고민 내가 대신 하는 중 (내 건 방치)"],"gi_INTJ":["\"그럴 수도 있지\" 거짓말쟁이","겉으론 수용, 속으론 대안 3개 준비 완료","웃으며 듣고 결국 내 계획 실행","그럴 수도 있지 (아님. 이미 정함)"],"gi_ISTP":["걱정만 하고 연락 안 하는 사람","걱정은 풀가동, 행동은 절전 모드","3일에 한 번 \"ㅇㅇ 살아있냐?\"","걱정은 하고 있음. 티도 연락도 안 함"],"gi_ISFP":["메뉴판 30분 정독러","\"너 먹고 싶은 거\" 무한 핑퐁","결정 못 하는 둘이 만나 점심시간 종료","아무거나 괜찮아 진짜로 (메뉴판 30분째)"],"gi_INFP":["최악 시나리오 전문 작가","답장 하나 늦으면 비극 5부작 완성","아무 일 없는데 혼자 이별 준비함","아직 아무 일도 없음 (머릿속은 완결)"],"gi_INTP":["확률로 위로하는 사람","위로 대신 \"통계적으로 그럴 일은 낮아\"","걱정도 데이터로 함","걱정 마. 확률 3%임 (위로 끝)"],"gi_ESTP":["가성비 즉흥러","\"가자!\" 하고 출발 전 최저가 검색 20분","즉흥인데 영수증은 다 챙김","즉흥 여행 (가성비 검증 완료)"],"gi_ESFP":["노는 척 출석 체크","제일 신나 보이는데 속으로 인원 세는 중","다들 재밌나 눈치 보느라 본인은 하나도 못 즐김","다들 재밌지?? (진짜인지 확인 중)"],"gi_ENFP":["설렘 반 걱정 반","\"이거 대박!\" 다음 날 \"근데 망하면?\"","하루에 꿈꾸고 포기하고 다시 꿈꿈","설렘 50 걱정 50 (멘탈은 롤러코스터)"],"gi_ENTP":["포용 가면 쓴 반박러","\"그럴 수 있지~ 근데 반대로 보면\"","다 이해한다면서 다 반박함","다 이해함. 근데 반박도 함"],"gi_ESTJ":["원 단위 정산왕","회비 정산을 1원 단위까지 함","안 낸 사람 이름을 공지에 올림","1인당 12,347원 (아직 안 낸 분 3명)"],"gi_ESFJ":["반찬통 추적자","반찬 싸줬는데 통 안 돌려주면 평생 기억함","다 챙기고 리액션 없으면 서운함 싹틈","반찬통은 돌려주세요 (3개월째)"],"gi_ENFJ":["남 인생 우선 처리반","남 이직 준비는 같이 해주고 내 이력서는 3년 전 버전","\"너는 잘될 거야\"가 입버릇, 내 일은 미룸","너는 잘될 거야 (나는 나중에... 언젠가)"],"gi_ENTJ":["다 들어주는 척 불도저","의견 다 듣고 결론은 원래 자기 안","평소엔 순한 밭, 목표 앞에선 불도저","의견 감사합니다. 결정은 제가 합니다"],"gyeong_ISTJ":["인정사정 없는 규정집","친구가 늦어도 \"규칙은 규칙이야\"","정 때문에 예외 만든 적 인생 0번","친해도 할인 없음"],"gyeong_ISFJ":["팩폭 후 새벽 사과러","팩폭 날리고 그날 밤 \"아까 심했나?\" 카톡","직설과 죄책감을 하루에 다 함","말은 칼같이, 사과는 새벽 2시에"],"gyeong_INFJ":["한 문장 판사","조용히 듣다 한 문장으로 상황 종료","겉은 차분, 속은 이미 유죄 선고","판결 났음. 항소 기각"],"gyeong_INTJ":["솔직함 과다 복용","\"솔직히 말해줘\" 했더니 진짜 솔직해서 상처받음","돌려 말하는 기능이 출고 때부터 없음","물어봤으니까 답한 거임 (상처는 셀프)"],"gyeong_ISTP":["위로 대신 수리 기사","고민 얘기했더니 말없이 해결해 놓음","공감 0, 해결 100","위로는 못 함. 고쳐줄게. 끝"],"gyeong_ISFP":["무뚝뚝한 선물 장인","\"별로야\" 직설 날리고 선물 고르는 데 3시간","표현은 0점, 정성은 100점","무뚝뚝한데 선물은 감성 충만 (비밀임)"],"gyeong_INFP":["키보드 정의의 사도","세상 불의엔 분노 폭발, 본인 설거지는 3일째 방치","댓글로 세상 바꾸다 정작 자기 마감은 못 지킴","세상을 바꾸고 싶음. 일단 내일부터"],"gyeong_INTP":["토론 해부학자","사소한 말에도 \"그건 틀렸어, 이유는…\"","댓글 논쟁도 새벽까지 이기려 함","감정 말고 논리로 오세요 (와도 짐)"],"gyeong_ESTP":["\"한 판만 더\" 무한루프","지면 이길 때까지 판을 늘림","보드게임 하다 우정에 금 가는 타입","질 때까지 함. 근데 안 짐"],"gyeong_ESFP":["분위기 깨는 의리파","신나게 놀다 갑자기 \"근데 너 그건 잘못했어\"","놀 때도 할 말은 꼭 하고 넘어감","놀 땐 놀고 팩폭할 땐 팩폭함"],"gyeong_ENFP":["화끈한 시작, 화끈한 포기","\"끝장 본다!\" → 2주 뒤 \"깔끔하게 접는다\"","열정이 식는 속도가 끓는 속도랑 같음","시작도 화끈, 손절도 화끈"],"gyeong_ENTP":["말싸움 국가대표","논쟁이 취미, 승리가 특기","토론 이기고 \"밥은 내가 살게\"로 약 올림","졌으면 인정해. 밥은 사줄게"],"gyeong_ESTJ":["칭찬도 혼내는 톤","칭찬도 \"이번엔 괜찮네. 다음엔 더 잘해\"","팩트에 잔소리 얹어서 콤보","칭찬임. 진짜임. 표정은 혼내는 중"],"gyeong_ESFJ":["\"솔직히 말할게\" 사기꾼","팩폭하려다 분위기 보고 칭찬만 하고 끝","할 말 삼키느라 속이 쇳덩이","할 말 있었는데 분위기 보고 참음 (속 쓰림)"],"gyeong_ENFJ":["사랑의 팩폭 전도사","\"너 위해서 하는 말인데\"로 뼈 때림","따뜻한 얼굴로 제일 아픈 말 함","사랑해서 하는 팩폭임 (아파도 참아)"],"gyeong_ENTJ":["양보 기능 미탑재","가위바위보도 전략 짜고 함","지는 상황 자체를 인정 안 함","양보? 그게 뭔데 먹는 건가요"],"sin_ISTJ":["오타 감지 센서","남의 오타 보이면 못 참고 지적함","책상 물건 각도까지 맞춰야 직성이 풀림","띄어쓰기 틀렸어요 (한 군데)"],"sin_ISFJ":["선물 사용 감시자","내가 준 선물 안 쓰면 바로 알아챔","섬세하게 챙기고 섬세하게 서운해함","그 선물 아직 안 뜯었지? (알고 있음)"],"sin_INFJ":["5초 컷 첫인상 판사","5초 만에 사람 판단, 근데 거의 맞아서 무서움","\"그 사람 좀 별로야\" 3달 뒤 적중","첫인상 적중률 97% (나머지는 진행 중)"],"sin_INTJ":["\"대충 해도 돼\" 함정 설치자","대충 하라 해놓고 결국 본인이 다 다시 함","기준이 높아서 아무도 통과 못 함","대충이 안 되는 체질 (남한테도)"],"sin_ISTP":["세 단어 멘탈 파괴범","말은 짧은데 정곡만 찌름","쿨한 척하면서 거슬리는 건 다 짚음","짧게 말함. 근데 아픔. 아주"],"sin_ISFP":["취향 침해 금지구역","내 취향 무시하면 조용히 3일 기억함","인테리어·옷·플리 전부 장인급 고집","취향 존중 부탁드립니다 (부탁 아님)"],"sin_INFP":["유리 멘탈 보석","칭찬 한마디에 하루 행복, 지적 한마디에 일주일 시무룩","예쁘고 예민하고 진심이라 주변이 피곤함","취급 주의. 깨지면 환불 불가"],"sin_INTP":["맞는 말 기분 나쁘게 하기 장인","\"틀린 건 아닌데 정확하진 않아\"","남의 오류 찾기가 취미","정확하게 말해주세요 (아니면 제가 고칠게요)"],"sin_ESTP":["급해도 거울 3번","즉흥 외출인데 스타일은 완벽해야 함","지는 것도 촌스러운 것도 못 참음","즉흥 외출 (준비 시간 1시간)"],"sin_ESFP":["단체사진 검열관","내 얼굴 별로면 업로드 금지령","카메라 각도 아는 사람. 남의 각도는 모름","그 사진 내려주세요 (내가 별로임)"],"sin_ENFP":["대충 시작, 밤샘 마무리","\"대충 해보자!\" → 결국 밤새 디테일 수정","아이디어는 막 던지고 결과는 깐깐","대충 시작, 완벽 마무리 (밤샘 확정)"],"sin_ENTP":["웃기 애매한 농담러","농담인데 너무 정확해서 아픔","말장난도 지는 거 못 참음","농담이었음 (팩트임)"],"sin_ESTJ":["폰트 크기 지적러","보고서 내용 말고 폰트부터 봄","기준 미달은 무조건 반려","내용은 좋음. 폰트가 문제임"],"sin_ESFJ":["\"맛있어?\" 5회 확인","생일상 차려놓고 반응 없으면 속으로 금 감","모임 준비 완벽주의자","맛있지? 맛있다고 해줘 (진심으로)"],"sin_ENFJ":["기대 압박 전문가","\"난 너한테 기대했는데…\" 한마디로 사람 각성시킴","기대치가 높아서 실망도 깊음","기대하고 있음 (부담 가지세요)"],"sin_ENTJ":["90점이 불만인 사람","90점 받고 \"10점 어디 갔지?\"","본인 기준에 본인도 숨참","100점 아니면 다시 함 (님도요)"],"im_ISTJ":["댐에 갇힌 바다","꿈은 세계 일주, 현실은 다음 주 일정표","큰 꿈 얘기하다 \"근데 일단 이번 주 마감\"","꿈은 바다, 현실은 엑셀"],"im_ISFJ":["측정 불가 호수","다 들어주고 본인 힘든 건 바닥에 가라앉힘","\"난 괜찮아\" 수심 측정 실패","겉은 잔잔, 속은 측정 불가"],"im_INFJ":["해저 1만 미터","몇 년 친구인데 아직도 새로운 면 발견됨","남은 다 꿰뚫어 보는데 본인은 1%만 공개","아직 1%밖에 안 보여줬음 (영원히)"],"im_INTJ":["10년 뒤를 사는 사람","지금 얘기하는데 10년 뒤 얘기로 대답함","혼자 생각이 너무 멀리 가서 대화 단절","지금 말고 10년 뒤 얘기 중 (따라오세요)"],"im_ISTP":["마감 1시간 전 평온러","\"어떻게든 되겠지\" 하고 진짜 됨","급한 사람만 속 터져서 쓰러짐","어떻게든 됨 (주변 사람 속은 타들어감)"],"im_ISFP":["연락두절 바다 여행자","\"바다 보고 싶다\" 하고 진짜 혼자 감","계획은 출발 후 생각","잠깐 바다 보고 옴 (연락 안 됨, 찾지 마)"],"im_INFP":["멍 때리며 은하 창조","멍 때리는 줄 알았는데 세계관 구축 중","소설 10편 연재 중, 완결은 미정","멍 때리는 거 아님. 세계관 구축 중"],"im_INTP":["1시간 강의 자판기","\"그거 왜 그래?\" 물었더니 1시간 강의","검색 하나 하다 새벽 4시 고대 문명","궁금하면 물어봐 (1시간 각오)"],"im_ESTP":["계획은 파도가 정함","계획 물어보면 \"흐름 봐서\"","기회 보이면 0.1초 만에 탐","계획은 파도가 정함 (파도도 모름)"],"im_ESFP":["인맥 바다","처음 간 모임에서 연락처 20개 수집","어딜 가든 \"거기 아는 사람 있어\"","거기 아는 사람 있어 (어디든)"],"im_ENFP":["꿈의 범람","\"세계 일주 하자\" 다음 주엔 \"우주 가자\"","마무리는 다음 물결에 떠넘김","꿈은 커야지 (실행은 다음 생에)"],"im_ENTP":["진심 판독 불가","진지하게 설득해 놓고 \"농담이야~\"","진심인지 장난인지 본인도 모름","진심일 수도 아닐 수도 (나도 모름)"],"im_ESTJ":["나만 예외인 규칙","남 일정은 체크하는데 본인 일정은 까먹음","규칙은 남한테만 적용됨","규칙은 지켜. (나는 예외)"],"im_ESFJ":["썰물 서운함","서운했는데 다음 날 아무 일 없던 듯 행동","상대만 혼자 눈치 보느라 지침","서운함은 썰물로 보냄 (밀물로 돌아옴)"],"im_ENFJ":["100명 모임 주선자","모임 주선했더니 100명 됨","사람 모으는 데 브레이크 없음","다 같이 가자 (인원 제한 없음, 예약은 님이)"],"im_ENTJ":["동네 카페로 글로벌 진출","카페 창업 얘기하다 해외 진출 계획 세움","스케일 조절 기능 고장","일단 세계 1등부터 (동네 1등은 건너뜀)"],"gye_ISTJ":["분위기 읽고 무시하는 사람","분위기 다 알면서 일정은 안 바꿈","감성은 있는데 규칙이 이김","감성은 있음. 일정 변경은 없음"],"gye_ISFJ":["별거 아닌 척 별거","다 챙겨주고 \"별거 아니야\" (별거임)","서운함이 이슬처럼 맺혀서 안 마름","별거 아니야 (평생 기억할 별거임)"],"gye_INFJ":["인간 독심술사","\"너 오늘 무슨 일 있지?\" 99% 적중","남 속은 다 보고 자기 속은 안개","말 안 해도 다 알아 (무서울 정도로)"],"gye_INTJ":["표정 결빙 감성러","감동받았는데 표정은 \"음, 괜찮네\"","속은 촉촉, 겉은 냉동실","감동받음 (표정은 영하 20도)"],"gye_ISTP":["알면서 모른 척 장인","다 알아챘는데 아무 말 안 함","눈치는 빠르고 반응은 \"ㅇㅇ\"","알고 있었음. 말 안 했을 뿐 (앞으로도 안 함)"],"gye_ISFP":["비 오면 쉬는 사람","비 온다고 약속 미루고 집에서 감성 충전","날씨가 곧 기분, 기분이 곧 일정","비 오는 날은 쉽니다 (감성 휴무)"],"gye_INFP":["우울 콘텐츠 정기 구독자","슬플 일이 없으면 만들어서라도 슬퍼함","새벽 감성 글 올리고 아침에 부끄러워서 삭제. 이걸 매주 반복","나 안 우울해. 우울한 게 취미일 뿐"],"gye_INTP":["조용한 정답 보유자","조용하길래 몰랐는데 정답 다 알고 있었음","안 물어보면 끝까지 말 안 함","물어보면 대답함. 안 물어보면 모르는 척"],"gye_ESTP":["분위기 탈출 마술사","분위기 싸해지기 1초 전에 사라짐","치고 빠지기 타이밍 천재","타이밍은 내가 정함 (도망 타이밍 포함)"],"gye_ESFP":["귀갓길 감성 폭발","모임에서 제일 신났는데 집 가는 길에 센치해짐","하루 텐션 그래프가 롤러코스터","파티 끝, 감성 타임 시작 (가로등 아래서)"],"gye_ENFP":["1시간에 4계절","1시간 안에 울고 웃고 삐지고 화해함","감정 기상청도 예보 포기","오늘 감정 날씨: 맑음→비→무지개→태풍"],"gye_ENTP":["웃으며 약점 저격수","3초 만에 약점 파악하고 \"아 농담~\"","정곡 찌르고 웃는 사람","농담임 (근데 맞잖아?)"],"gye_ESTJ":["공감형 마감 독촉","\"힘든 거 알아. 그래도 마감은 내일이야\"","마음은 다 읽고 일정은 안 바꿈","공감함. 마감은 지켜 (공감 끝)"],"gye_ESFJ":["읽씹 1시간 = 비상사태","답장 늦으면 \"나 뭐 잘못했어?\"","걱정 비가 그칠 줄 모름","괜찮아? 무슨 일 있어? (3번째)"],"gye_ENFJ":["모르게 스며드는 봄비","설득당한 줄도 모르고 그 사람 말대로 하고 있음","잔소리 없이 사람 바꾸는 무서운 능력","강요 안 했음. 스며들었을 뿐 (탈출 불가)"],"gye_ENTJ":["물방울 정복자","아무도 몰랐는데 이미 판 다 짜놓음","조용히 끈질기게 결국 다 가져감","한 방울씩. 결국 뚫음 (님 멘탈도)"]};
+let spicy = false;
+const T = c => spicy && SP[c.id] ? Object.assign({}, c.mild, {nickname: SP[c.id][0], summary: SP[c.id][1], annoying: SP[c.id][2], share: SP[c.id][3]}) : c.mild;
+$("bSpicy").addEventListener("click", () => { if (!cur) return; spicy = !spicy; show(cur); });
+
+// 오늘의 운세 한 줄 — 내 일간과 오늘 일진의 관계 + MBTI 팁 (같은 날은 같은 결과)
+const GZK = ["갑","을","병","정","무","기","경","신","임","계"], ZH = "子丑寅卯辰巳午未申酉戌亥", ZK = ["자","축","인","묘","진","사","오","미","신","유","술","해"];
+const FT = {
+  hap: ["천생연분 날", ["미뤄둔 연락 하나 먼저 보내봐. 답장이 반가울 날", "처음 만나는 사람이랑 이상하게 잘 맞을 수 있는 날", "부탁하면 잘 들어주는 날. 하고 싶던 말 있으면 오늘", "말 안 해도 통하는 하루. 눈치 게임 승률 높음", "오늘 같이 밥 먹는 사람이 의외의 귀인일 수도"]],
+  same: ["같은 기운의 날", ["내 고집이 평소의 1.5배인 날. 한 번은 져주기", "동료가 경쟁자가 되기 쉬운 날. 양보 하나가 이득", "비슷한 사람끼리 부딪히는 날. 같은 말 두 번 하면 싸움각", "자신감 충전된 날. 혼자 하는 일 진도가 잘 나감", "내 편은 많은데 내 몫은 나눠야 하는 날"]],
+  give: ["내가 베푸는 날", ["내 기운이 밖으로 새는 날. 부탁 3개 오면 2개는 거절해도 됨", "말이 술술 나오는 날. 대신 말실수도 술술", "아이디어가 잘 떠오르는 날. 바로 메모해 두기", "남 챙기다 내 체력이 방전되는 날. 저녁은 혼자 쉬기", "표현력 만렙인 날. 칭찬 하나 먼저 건네보기"]],
+  get: ["도움받는 날", ["누가 날 챙겨주는 날. 도움 오면 사양 말고 받기", "배움 운 있는 날. 오늘 들은 말 하나가 오래 남음", "몸은 느긋하고 머리는 맑은 날. 생각 정리하기 좋음", "선배·어른이랑 얘기하면 의외로 풀리는 날", "게을러져도 용서되는 날. 단, 할 일 하나만은 끝내기"]],
+  win: ["주도권 잡는 날", ["내가 주도권 잡는 날. 미뤄둔 결정 하나 끝내기", "할 일 쳐내기 좋은 날. 체크리스트 지우는 맛 있음", "실속 챙기기 좋은 날. 대신 너무 몰아붙이면 원망받음", "욕심이 올라오는 날. 장바구니는 하루 묵혔다 결제", "추진력 좋은 날. 근데 남 말도 한 번은 들어주기"]],
+  lose: ["살짝 눌리는 날", ["기가 살짝 눌리는 날. 큰 결정은 내일로", "잔소리 들을 확률 높은 날. 한 귀로 듣고 한 귀로 흘리기", "규칙·마감에 쫓기는 날. 일찍 시작하면 반은 먹고 들어감", "내 맘대로 안 되는 날. 계획 B 하나 챙겨두기", "참는 게 이득인 날. 오늘 참은 말은 내일 더 잘 나옴"]]
+};
+const TIP = {
+  ISTJ: ["계획에 없는 일 1개는 웃으며 받아주기", "오늘 체크리스트에 '쉬기'도 넣기"],
+  ISFJ: ["오늘은 '싫어' 한 번 말해보는 날", "남 말고 나 먹고 싶은 메뉴로 고르기"],
+  INFJ: ["속으로 판결 내리기 전에 한 번 물어보기", "동굴 들어가기 전에 한 명한테만 연락하기"],
+  INTJ: ["결론 말하기 전에 '네 생각은?' 한 번", "완벽한 계획보다 70% 계획으로 출발"],
+  ISTP: ["'ㅇㅇ' 대신 세 글자 이상 답장하기", "고쳐주기 전에 '힘들었겠다' 먼저"],
+  ISFP: ["침대에서 나오면 오늘 할 일 절반은 끝", "좋아하는 거 하나 사진 찍어두기"],
+  INFP: ["상상 속 서운함은 오늘 밤 12시에 자동 삭제", "걱정 말고 좋았던 일 3개 적어보기"],
+  INTP: ["오늘은 분석 말고 공감 한 마디", "미뤄둔 답장 하나 보내기"],
+  ESTP: ["출발 전에 딱 5분만 생각하기", "오늘 지른 거 영수증 챙겨두기"],
+  ESFP: ["오늘 쓴 돈 저녁에 한 번 계산해보기", "사진 말고 눈으로 한 장면 담기"],
+  ENFP: ["새 계획 말고 어제 계획 하나 끝내기", "알림 끄고 30분 집중해보기"],
+  ENTP: ["반박하고 싶은 말 하나는 삼키기", "오늘은 '네 말이 맞다' 한 번 말해보기"],
+  ESTJ: ["잔소리 하나 줄이면 분위기 두 배", "남 일정 말고 내 휴식 일정 챙기기"],
+  ESFJ: ["읽씹은 바빠서임. 오늘은 걱정 금지", "칭찬받으려 말고 칭찬하고 끝내기"],
+  ENFJ: ["남 인생 말고 내 인생 코칭하는 날", "부탁 안 받은 조언은 하나만"],
+  ENTJ: ["오늘 회의는 남한테 결론 맡겨보기", "90점이면 충분한 날"]
+};
+function drawFt(c) {
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+  const n = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1900, 0, 1)) / 864e5), i = (((10 + n) % 60) + 60) % 60;
+  const ts = STEMS[i % 10], a = c.ilgan, ea = EL[a], eb = EL[ts];
+  const k = HAP[a] === ts ? "hap" : ea === eb ? "same" : (ea + 1) % 5 === eb ? "give" : (eb + 1) % 5 === ea ? "get" : (ea + 2) % 5 === eb ? "win" : "lose";
+  const key = `${y}-${m}-${d}`, line = FT[k][1][hh(key + c.id) % 5], tip = TIP[c.mbti][hh(key + c.mbti) % 2];
+  $("ft").innerHTML = `<small>${m}월 ${d}일 오늘의 한 줄 · 오늘은 ${GZK[i % 10]}${ZK[i % 12]}일(${IL[ts][1]}${ZH[i % 12]}) → ${IL[a][0]}에게 ${FT[k][0]}</small><b>${esc(line)}</b><span>${c.mbti} 팁: ${esc(tip)}</span>`;
+}
+
+// 결과 나오기 전 연출 (약 2초)
+let busy = false;
+async function reveal(c) {
+  busy = true;
+  const il = IL[c.ilgan];
+  document.documentElement.style.setProperty("--el", il[3]);
+  $("res").style.display = "none";
+  const ld = $("load"); ld.style.display = "flex";
+  ld.scrollIntoView({behavior:"smooth", block:"center"});
+  const steps = [
+    [il[1], `${il[0]} 기운 읽는 중…`],
+    [c.mbti[0], `${c.mbti} 성향 섞는 중…`],
+    ["!", c.chem === "시너지" ? "오, 잘 맞는 조합이다" : "어라, 부딪히는 조합이다"]
+  ];
+  for (const [o, s] of steps) { $("orb").textContent = o; $("lt").textContent = s; await wait(650); }
+  ld.style.display = "none";
+  show(c);
+  busy = false;
+}
+
+$("f").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = $("bd").value;
+  if (!v) { $("err").textContent = "생년월일을 넣어주세요."; return; }
+  const [y,m,d] = v.split("-").map(Number);
+  if (y < 1920 || y > 2025) { $("err").textContent = "1920~2025년 사이로 넣어주세요."; return; }
+  $("err").textContent = "";
+  const id = dayStem(y,m,d,$("late").checked) + "_" + pick.join("");
+  const c = MAP[id];
+  if (!c) { $("err").textContent = "이 조합 문구가 아직 없어요: " + id; return; }
+  if (!busy) { mine = c; reveal(c); track("result", c.id); }
+});
+
+$("bAgain").addEventListener("click", () => {
+  $("res").style.display = "none"; window.scrollTo({top:0, behavior:"smooth"});
+});
+
+$("bAsk").addEventListener("click", async () => {
+  if (!mine) return;
+  const il = IL[mine.ilgan], b = ranks(mine).best[0].c, bi = IL[b.ilgan], btn = $("bAsk"), old = btn.textContent;
+  const txt = `나 ${il[0]} ${mine.mbti}(${mine.mild.nickname})인데 나랑 찰떡 1위가 ${bi[0]} ${b.mbti}래 ㅋㅋ 너는 무슨 조합이야?`;
+  try { await navigator.clipboard.writeText(txt); btn.textContent = "복사됨! 단톡방에 붙여넣기"; }
+  catch { btn.textContent = "복사 안 됨"; }
+  setTimeout(() => btn.textContent = old, 1600);
+});
+
+// 찰떡·상극 카드 누르면 그 조합 결과 보기
+const openMi = e => {
+  const li = e.target.closest(".mi"); if (!li || e.target.closest("details")) return;
+  if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault(); const c = MAP[li.dataset.id]; if (c) show(c);
+};
+["mBest", "mWorst"].forEach(id => { $(id).addEventListener("click", openMi); $(id).addEventListener("keydown", openMi); });
+$("bBack").addEventListener("click", () => { if (mine) show(mine); });
+$("tz").addEventListener("click", () => $("mt").scrollIntoView({behavior: RM ? "auto" : "smooth", block: "start"}));
+
+$("bCopy").addEventListener("click", async () => {
+  if (!cur) return;
+  const il = IL[cur.ilgan], t = T(cur);
+  const txt = `[${il[0]} × ${cur.mbti}] ${t.nickname}\n${t.summary}\n“${t.share}”`;
+  try { await navigator.clipboard.writeText(txt); $("bCopy").textContent = "복사됨!"; }
+  catch { $("bCopy").textContent = "복사 안 됨"; }
+  setTimeout(() => $("bCopy").textContent = "문구 복사", 1500);
+});
+
+// 공유 이미지 (1080x1350)
+function wrapText(ctx, text, maxW) {
+  // 띄어쓰기 단위로 줄바꿈, 한 단어가 너무 길 때만 글자 단위로 자름
+  const lines = []; let line = "";
+  for (const w of text.split(" ")) {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width <= maxW) { line = test; continue; }
+    if (line) lines.push(line);
+    line = "";
+    for (const ch of w) {
+      if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; }
+      else line += ch;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);ctx.fill();}
+$("bImg").addEventListener("click", async () => {
+  if (!cur) return;
+  try { await document.fonts.ready; } catch {}
+  const il = IL[cur.ilgan], t = T(cur), W = 1080, H = 1350, P = 90;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const x = cv.getContext("2d");
+  x.fillStyle = il[3]; x.fillRect(0,0,W,H);
+  x.globalAlpha = .12; x.fillStyle = "#fff"; x.font = "900 520px 'Noto Sans KR', serif";
+  x.textBaseline = "top"; x.fillText(il[1], W-470, -60); x.globalAlpha = 1;
+  // 칩
+  x.font = "700 40px 'Noto Sans KR', sans-serif";
+  let cx = P;
+  [[`${il[0]} ${il[1]}`,0],[cur.mbti,0],[(cur.chem==="시너지"?"시너지 조합":"충돌 조합")+(spicy?" · 매운맛":""),1]].forEach(([s,hot]) => {
+    const w = x.measureText(s).width + 56;
+    x.fillStyle = hot ? "#fff" : "rgba(255,255,255,.22)"; rr(x,cx,P,w,72,36);
+    x.fillStyle = hot ? il[3] : "#fff"; x.fillText(s, cx+28, P+12); cx += w + 18;
+  });
+  // 별명
+  x.fillStyle = "#fff"; x.font = "110px 'Black Han Sans', sans-serif";
+  let y = P + 150;
+  wrapText(x, t.nickname, W-2*P).slice(0,3).forEach(l => { x.fillText(l, P, y); y += 124; });
+  // 요약
+  x.font = "700 46px 'Noto Sans KR', sans-serif"; y += 20;
+  wrapText(x, t.summary, W-2*P).slice(0,3).forEach(l => { x.fillText(l, P, y); y += 64; });
+  // 킹받는 포인트
+  y += 40; x.fillStyle = "rgba(0,0,0,.2)";
+  x.font = "400 40px 'Noto Sans KR', sans-serif";
+  const an = wrapText(x, t.annoying, W-2*P-80).slice(0,3);
+  const bh = 90 + an.length*56; rr(x,P,y,W-2*P,bh,30);
+  x.fillStyle = "rgba(255,255,255,.8)"; x.font = "700 32px 'Noto Sans KR', sans-serif"; x.fillText("킹받는 포인트", P+40, y+30);
+  x.fillStyle = "#fff"; x.font = "400 40px 'Noto Sans KR', sans-serif";
+  an.forEach((l,i) => x.fillText(l, P+40, y+80+i*56));
+  // 짤 문구
+  x.font = "700 52px 'Gowun Dodum', sans-serif";
+  const sh = wrapText(x, "“"+t.share+"”", W-2*P-100).slice(0,3);
+  const qh = 80 + sh.length*70, qy = H - P - 80 - qh;
+  if (topBest) {
+    const bb = topBest.c, bi = IL[bb.ilgan], ly = qy - 72;
+    if (ly > y + bh + 16) {
+      x.fillStyle = "#fff"; x.font = "700 40px 'Noto Sans KR', sans-serif"; x.textAlign = "left";
+      x.fillText(`${mine && cur.id === mine.id ? "내 " : ""}찰떡 1위 → ${bi[0]} ${bb.mbti} · 궁합 ${topBest.pct}%`, P, ly);
+    }
+  }
+  x.fillStyle = "#fff"; rr(x,P,qy,W-2*P,qh,30);
+  x.fillStyle = "#1b1a17"; x.textAlign = "center";
+  sh.forEach((l,i) => x.fillText(l, W/2, qy+40+i*70));
+  x.fillStyle = "rgba(255,255,255,.75)"; x.font = "400 32px 'Noto Sans KR', sans-serif";
+  x.fillText(`${TOTAL}개 조합 중 단 1개 · 내 사주 일간 × MBTI 조합 테스트`, W/2, H-P-20);
+  $("shot").src = cv.toDataURL("image/png");
+  $("imgwrap").style.display = "block";
+  $("imgwrap").scrollIntoView({behavior:"smooth", block:"center"});
+});
+}
+</script>
+</body>
+</html>
