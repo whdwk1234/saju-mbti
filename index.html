@@ -40,18 +40,22 @@ input[type=date]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;bor
 button:focus-visible,input:focus-visible{outline:3px solid #f0b400;outline-offset:2px}
 .err{color:#c43b2b;font-size:14px;margin:10px 0 0;min-height:1em}
 #res{margin-top:22px;display:none}
-.card{background:var(--el);color:#fff;border-radius:22px;padding:24px 22px 22px;position:relative;overflow:hidden;animation:pop .45s ease-out}
-.card::after{content:attr(data-han);position:absolute;right:-10px;top:-24px;font:900 150px/1 "Noto Sans KR",serif;opacity:.12;pointer-events:none}
+.card{--c1:var(--el);--c2:var(--el);--ac:#fff;background:radial-gradient(110% 60% at 0% 100%,color-mix(in srgb,var(--ac) 42%,transparent),transparent 65%),radial-gradient(80% 50% at 100% 0%,rgba(255,255,255,.22),transparent 60%),linear-gradient(155deg,var(--c1) 0%,var(--c1) 35%,var(--c2) 100%);color:#fff;border-radius:24px;padding:24px 22px 22px;position:relative;overflow:hidden;isolation:isolate;animation:pop .45s ease-out;box-shadow:0 18px 40px -18px color-mix(in srgb,var(--c1) 80%,transparent),inset 0 1px 0 rgba(255,255,255,.35);text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.18;mix-blend-mode:overlay;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.card::after{content:attr(data-han);position:absolute;right:-14px;top:-30px;z-index:-1;font:900 170px/1 "Noto Sans KR",serif;color:transparent;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 85%);-webkit-background-clip:text;background-clip:text;pointer-events:none}
+.ccol{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:13px;font-weight:700;opacity:.95}
+.ccol i{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.85);box-shadow:0 1px 4px rgba(0,0,0,.25);flex:none}
+.ccol i+i{margin-left:-14px}
 @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}}
 @media(prefers-reduced-motion:reduce){.card{animation:none}}
 .tag{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700;font-size:15px}
-.chip{background:rgba(255,255,255,.2);border-radius:99px;padding:3px 12px;white-space:nowrap}
-.chip.hot{background:#fff;color:var(--el)}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:3px 12px;white-space:nowrap;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.chip.hot{background:#fff;color:var(--c1);border-color:#fff;text-shadow:none}
 .nick{font:400 clamp(32px,9vw,44px)/1.1 "Black Han Sans",sans-serif;margin:16px 0 8px;text-wrap:balance;position:relative}
 .sum{font-size:17px;font-weight:700;margin:0 0 16px;opacity:.95}
-.box{background:rgba(0,0,0,.18);border-radius:14px;padding:14px 16px;margin-top:10px}
+.box{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 16px;margin-top:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
 .box b{display:block;font-size:13px;opacity:.8;margin-bottom:2px}
-.quote{margin-top:16px;background:#fff;color:#1b1a17;border-radius:14px;padding:16px;font:20px/1.4 "Gowun Dodum",sans-serif;font-weight:700;text-align:center}
+.quote{margin-top:16px;background:#fff;color:#1b1a17;border-radius:16px;padding:18px 16px;font:20px/1.4 "Gowun Dodum",sans-serif;font-weight:700;text-align:center;text-shadow:none;box-shadow:0 10px 24px -12px rgba(0,0,0,.45),inset 0 -3px 0 color-mix(in srgb,var(--ac) 70%,transparent)}
 .acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
 .acts button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:700 14px "Noto Sans KR",sans-serif;cursor:pointer}
 #imgwrap{display:none;margin-top:14px;text-align:center}
@@ -130,7 +134,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #f0b400;outline-offse
 .rx .st{font-size:13px;font-weight:700;opacity:.8;width:100%}
 .card .rx{position:relative}
 .card .rx button{border-color:rgba(255,255,255,.55)}
-.card .rx button.on{background:#fff;color:var(--el);border-color:#fff}
+.card .rx button.on{background:#fff;color:var(--c1);border-color:#fff;text-shadow:none}
 .rxn{display:none;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;font-size:13px;color:var(--sub);margin:10px 2px 0}
 .rxn button{min-height:36px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:700 13px "Noto Sans KR",sans-serif;padding:0 12px;cursor:pointer}
 #memoT{width:100%;font:16px "Noto Sans KR",sans-serif;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);resize:vertical}
@@ -287,6 +291,7 @@ input[type=time]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;bor
       <div class="box"><b>킹받는 포인트</b><span id="cAn"></span></div>
       <div class="quote" id="cSh"></div>
       <p class="rare" id="cRare"></p>
+      <p class="ccol" id="cCol"></p>
       <div class="rx" id="cRx"></div>
       <button class="spb" id="bSpicy" type="button" aria-pressed="false">매운맛 보기</button>
     </div>
@@ -742,13 +747,22 @@ function drawMatch(me) {
   $("tz").innerHTML = `<span class="g">찰떡 1위<b>${lab(best[0])}</b><small>잘 맞는 TOP 3 보기 ↓</small></span><span class="r">상극 1위<b>${lab(worst[0])}</b><small>안 맞는 TOP 3 보기 ↓</small></span>`;
 }
 
+// 결과 카드 컬러: 일간별 고유색 2개 + MBTI 기질별 포인트색
+const PAL = {
+  gap:["#174f36","#2f9463","숲 그린"], eul:["#1d6b55","#4fae8a","새싹 민트"], byeong:["#b8361a","#ec8a2f","선셋 오렌지"], jeong:["#a32d4c","#e8706f","캔들 코랄"], mu:["#7a4d0c","#c08a1f","머스터드"],
+  gi:["#86452a","#c4774a","테라코타"], gyeong:["#2e3a4d","#7686a0","스틸 실버"], sin:["#4a3f78","#9182c6","펄 라벤더"], im:["#0d2a57","#2a66ad","딥 오션"], gye:["#164f78","#4796c4","레인 스카이"]
+};
+const MPAL = {NT:["#9b6bff","바이올렛"], NF:["#2fd19a","에메랄드"], SJ:["#4f93ff","코발트"], SP:["#ffc23d","골드"]};
+const mGrp = m => m[1] === "N" ? (m[2] === "T" ? "NT" : "NF") : (m[3] === "J" ? "SJ" : "SP");
 let cur = null;
 function show(c) {
   cur = c;
   const il = IL[c.ilgan], t = T(c);
   document.documentElement.style.setProperty("--el", il[3]);
-  const card = $("card");
+  const card = $("card"), pl = PAL[c.ilgan], mp = MPAL[mGrp(c.mbti)];
   card.dataset.han = il[1];
+  card.style.setProperty("--c1", pl[0]); card.style.setProperty("--c2", pl[1]); card.style.setProperty("--ac", mp[0]);
+  $("cCol").innerHTML = `<i style="background:linear-gradient(135deg,${pl[0]},${pl[1]})"></i><i style="background:${mp[0]}"></i><span>${il[0]} 컬러 ${pl[2]} × ${c.mbti} 컬러 ${mp[1]}</span>`;
   $("cIl").textContent = `${il[0]} ${il[1]}`;
   $("cMb").textContent = c.mbti;
   $("cCh").textContent = (c.chem === "시너지" ? "시너지 조합" : "충돌 조합") + (spicy ? " · 매운맛" : "");
@@ -1442,16 +1456,24 @@ $("bImg").addEventListener("click", async () => {
   const il = IL[cur.ilgan], t = T(cur), W = 1080, H = 1350, P = 90;
   const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const x = cv.getContext("2d");
-  x.fillStyle = il[3]; x.fillRect(0,0,W,H);
-  x.globalAlpha = .12; x.fillStyle = "#fff"; x.font = "900 520px 'Noto Sans KR', serif";
-  x.textBaseline = "top"; x.fillText(il[1], W-470, -60); x.globalAlpha = 1;
+  const pl = PAL[cur.ilgan], mp = MPAL[mGrp(cur.mbti)];
+  let g = x.createLinearGradient(0, 0, W * .55, H); g.addColorStop(0, pl[0]); g.addColorStop(.35, pl[0]); g.addColorStop(1, pl[1]);
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+  g = x.createRadialGradient(0, H, 0, 0, H, W * 1.05); g.addColorStop(0, mp[0] + "88"); g.addColorStop(1, mp[0] + "00");
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+  g = x.createRadialGradient(W, 0, 0, W, 0, W * .8); g.addColorStop(0, "rgba(255,255,255,.28)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+  x.font = "900 560px 'Noto Sans KR', serif"; x.textBaseline = "top";
+  g = x.createLinearGradient(0, -80, 0, 480); g.addColorStop(0, "rgba(255,255,255,.22)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  x.fillStyle = g; x.fillText(il[1], W-500, -80);
   // 칩
   x.font = "700 40px 'Noto Sans KR', sans-serif";
   let cx = P;
   [[`${il[0]} ${il[1]}`,0],[cur.mbti,0],[(cur.chem==="시너지"?"시너지 조합":"충돌 조합")+(spicy?" · 매운맛":""),1]].forEach(([s,hot]) => {
     const w = x.measureText(s).width + 56;
-    x.fillStyle = hot ? "#fff" : "rgba(255,255,255,.22)"; rr(x,cx,P,w,72,36);
-    x.fillStyle = hot ? il[3] : "#fff"; x.fillText(s, cx+28, P+12); cx += w + 18;
+    x.fillStyle = hot ? "#fff" : "rgba(255,255,255,.18)"; rr(x,cx,P,w,72,36);
+    if (!hot) { x.lineWidth = 2; x.strokeStyle = "rgba(255,255,255,.35)"; x.stroke(); }
+    x.fillStyle = hot ? pl[0] : "#fff"; x.fillText(s, cx+28, P+12); cx += w + 18;
   });
   // 별명
   x.fillStyle = "#fff"; x.font = "110px 'Black Han Sans', sans-serif";
@@ -1460,11 +1482,18 @@ $("bImg").addEventListener("click", async () => {
   // 요약
   x.font = "700 46px 'Noto Sans KR', sans-serif"; y += 20;
   wrapText(x, t.summary, W-2*P).slice(0,3).forEach(l => { x.fillText(l, P, y); y += 64; });
+  // 시너지·충돌 포인트
+  y += 34; x.font = "400 40px 'Noto Sans KR', sans-serif";
+  const pt = wrapText(x, t.point, W-2*P-80).slice(0,3), ph = 90 + pt.length*56;
+  x.fillStyle = "rgba(255,255,255,.13)"; rr(x,P,y,W-2*P,ph,30); x.lineWidth = 2; x.strokeStyle = "rgba(255,255,255,.25)"; x.stroke();
+  x.fillStyle = "rgba(255,255,255,.8)"; x.font = "700 32px 'Noto Sans KR', sans-serif"; x.fillText(cur.chem === "시너지" ? "시너지 포인트" : "충돌 포인트", P+40, y+30);
+  x.fillStyle = "#fff"; x.font = "400 40px 'Noto Sans KR', sans-serif"; pt.forEach((l,i) => x.fillText(l, P+40, y+80+i*56));
+  y += ph - 16;
   // 킹받는 포인트
-  y += 40; x.fillStyle = "rgba(0,0,0,.2)";
+  y += 40; x.fillStyle = "rgba(255,255,255,.13)";
   x.font = "400 40px 'Noto Sans KR', sans-serif";
   const an = wrapText(x, t.annoying, W-2*P-80).slice(0,3);
-  const bh = 90 + an.length*56; rr(x,P,y,W-2*P,bh,30);
+  const bh = 90 + an.length*56; rr(x,P,y,W-2*P,bh,30); x.lineWidth = 2; x.strokeStyle = "rgba(255,255,255,.25)"; x.stroke();
   x.fillStyle = "rgba(255,255,255,.8)"; x.font = "700 32px 'Noto Sans KR', sans-serif"; x.fillText("킹받는 포인트", P+40, y+30);
   x.fillStyle = "#fff"; x.font = "400 40px 'Noto Sans KR', sans-serif";
   an.forEach((l,i) => x.fillText(l, P+40, y+80+i*56));
@@ -1479,6 +1508,7 @@ $("bImg").addEventListener("click", async () => {
       x.fillText(`${mine && cur.id === mine.id ? "내 " : ""}찰떡 1위 → ${bi[0]} ${bb.mbti} · 궁합 ${topBest.pct}%`, P, ly);
     }
   }
+  x.fillStyle = mp[0]; rr(x,P,qy+8,W-2*P,qh,30);
   x.fillStyle = "#fff"; rr(x,P,qy,W-2*P,qh,30);
   x.fillStyle = "#1b1a17"; x.textAlign = "center";
   sh.forEach((l,i) => x.fillText(l, W/2, qy+40+i*70));
