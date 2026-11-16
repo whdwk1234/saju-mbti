@@ -58,7 +58,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #f0b400;outline-offse
 .box{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 16px;margin-top:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
 .box b{display:block;font-size:13px;opacity:.8;margin-bottom:2px}
 .quote{margin-top:16px;background:#fff;color:#1b1a17;border-radius:16px;padding:18px 16px;font:20px/1.4 "Gowun Dodum",sans-serif;font-weight:700;text-align:center;text-shadow:none;box-shadow:0 10px 24px -12px rgba(0,0,0,.45),inset 0 -3px 0 color-mix(in srgb,var(--ac) 70%,transparent)}
-.acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
 .acts button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:700 14px "Noto Sans KR",sans-serif;cursor:pointer}
 #imgwrap{display:none;margin-top:14px;text-align:center}
 #imgwrap img{width:100%;max-width:360px;border-radius:14px;border:1px solid var(--line)}
@@ -258,6 +258,32 @@ input[type=time]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;bor
 .dw .pc em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--sub)}
 .sew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;text-align:center}
 .sew .pc b{font-size:22px}
+#rpc{position:fixed;left:-10000px;top:0;width:450px;background:#FAFAFA;border-radius:24px;padding:28px 24px;color:#191F28;display:flex;flex-direction:column;gap:18px;font-family:"Pretendard Variable",Pretendard,"Noto Sans KR",sans-serif;text-shadow:none}
+#rpc *{box-sizing:border-box;margin:0;padding:0}
+#rpc .hd{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E5E8EB;padding-bottom:12px;font-size:13px;color:#8B95A1}
+#rpc .hd b{color:var(--k1)}
+#rpc .up{display:flex;align-items:center;justify-content:space-between;background:#F2F4F6;padding:10px 16px;border-radius:12px;font-size:13px}
+#rpc .cb{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0}
+#rpc .bi{padding:6px 14px;border-radius:20px;font-weight:700;font-size:15px;color:#fff}
+#rpc .mt{text-align:center;background:linear-gradient(135deg,var(--k3) 0%,#fff 100%);border:1px solid var(--k2);padding:20px 16px;border-radius:16px}
+#rpc .mt h2{font:24px/1.3 "yg-jalnan","Noto Sans KR",sans-serif;color:var(--k1);margin-bottom:6px}
+#rpc .mt p{font-size:13.5px;color:#4E5968;font-weight:500}
+#rpc .dg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#rpc .sb,#rpc .ai{background:#fff;border:1px solid #E5E8EB;border-radius:14px;padding:14px}
+#rpc .bt{font-size:12px;font-weight:700;color:#8B95A1;margin-bottom:8px}
+#rpc table{width:100%;border-collapse:collapse;text-align:center;font-size:12px}
+#rpc th,#rpc td{border:1px solid #E5E8EB;padding:4px 2px}
+#rpc th{background:#F9FAFB;color:#6B7684;font-weight:700}
+#rpc td.hl{background:var(--k3);font-weight:700;color:var(--k1)}
+#rpc .kv{font-size:12px;line-height:1.7;color:#4E5968}
+#rpc .al{display:flex;flex-direction:column;gap:10px}
+#rpc .ai h4{font-size:14px;font-weight:700;margin-bottom:6px}
+#rpc .ai p{font-size:12.5px;color:#4E5968;line-height:1.5}
+#rpc .tc{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#rpc .tg{font-size:11px;padding:3px 8px;border-radius:6px;background:#F2F4F6;color:#4E5968}
+#rpc .mf{background:#191F28;color:#fff;border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center}
+#rpc .mf div{font-size:12.5px;line-height:1.6}
+#rpc .mf strong{color:#FFD15C}
 .wwarn{margin:10px 0 0;font-size:13px;color:#b67a12;font-weight:700}
 </style>
 </head>
@@ -303,6 +329,7 @@ input[type=time]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;bor
     <button class="tz" id="tz" type="button" aria-label="찰떡·상극 TOP 3로 이동"></button>
     <div class="acts">
       <button id="bImg" type="button">공유 이미지</button>
+      <button id="bRpt" type="button">분석 리포트</button>
       <button id="bCopy" type="button">문구 복사</button>
       <button id="bAgain" type="button">다시 하기</button>
     </div>
@@ -1452,6 +1479,59 @@ function wrapText(ctx, text, maxW) {
   return lines;
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);ctx.fill();}
+
+// ===== 분석 리포트 카드 (디자인: Gemini 템플릿) =====
+let h2cP = null;
+const loadH2C = () => h2cP || (h2cP = new Promise((ok, no) => {
+  const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+  sc.onload = ok; sc.onerror = () => { h2cP = null; no(); }; document.head.appendChild(sc);
+  if (!document.getElementById("pretl")) { const l = document.createElement("link"); l.id = "pretl"; l.rel = "stylesheet"; l.href = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"; document.head.appendChild(l); }
+}));
+function reportHTML(c, ch) {
+  const il = IL[c.ilgan], t = T(c), pl = PAL[c.ilgan], mp = MPAL[mGrp(c.mbti)], me = ch.d[0];
+  const cols = [["시", ch.h], ["일", ch.d], ["월", ch.m], ["년", ch.y]];
+  const cnt = [0,0,0,0,0];
+  const nm = (k, stem) => { if (k == null) return "?"; const e = stem ? Math.floor(k / 2) : ZEL[k]; cnt[e]++; return (stem ? GHK[k] : ZHK[k]) + OHN[e]; };
+  const r1 = cols.map(x => `<td${x[0] === "일" ? ' class="hl"' : ""}>${x[1] ? nm(x[1][0], true) : "?"}</td>`).join("");
+  const r2 = cols.map(x => `<td${x[0] === "일" ? ' class="hl"' : ""}>${x[1] ? nm(x[1][1], false) : "?"}</td>`).join("");
+  const tot = cnt.reduce((a, b) => a + b, 0), top = [0,1,2,3,4].sort((a, b) => cnt[b] - cnt[a]).slice(0, 2);
+  const st = strength(ch), du = daeun(ch, SEX);
+  const age = Math.floor((Date.now() - ch.ut) / (365.2425 * 864e5));
+  let dtx = "성별 고르면 표시";
+  if (du) { const i = du.list.map(x => x.age <= age).lastIndexOf(true); dtx = i >= 0 ? `${GHK[du.list[i].s]}${ZHK[du.list[i].b]} 대운 (${tenGod(me, du.list[i].s)})` : `${du.start}살부터 시작`; }
+  const Y = new Date().getFullYear(), ys = md(Y - 4, 10), yb = md(Y - 4, 12);
+  const si = SIT.ilgan[c.ilgan], sm = SIT.mbti[c.mbti], {best, worst} = ranks(c);
+  const ilj = ILJU[gz60(ch.d[0], ch.d[1])], syn = c.chem === "시너지";
+  const lab = r => `${IL[r.c.ilgan][0]}(${IL[r.c.ilgan][1]}) ${r.c.mbti} ${r.pct}%`;
+  return `<div class="hd"><span>사주 × MBTI 분석 리포트</span><b>saju-mbti-tau.vercel.app</b></div>
+  <div class="up"><span><b>${GHK[ch.d[0]]}${ZHK[ch.d[1]]}일주</b> · ${ilj[0]}</span><span>${STN[st.lv]}</span></div>
+  <div class="cb"><span class="bi" style="background:${pl[0]}">${il[0]}(${il[1]}) 일간</span><span style="font-weight:700;color:#8B95A1">×</span><span class="bi" style="background:${mp[0]};color:${mGrp(c.mbti) === "SP" ? "#191F28" : "#fff"}">${c.mbti}</span></div>
+  <div class="mt"><h2>"${esc(t.nickname)}"</h2><p>${esc(t.summary)}</p></div>
+  <div class="dg"><div class="sb"><div class="bt">사주 8글자 (원국표)</div><table><tr><th>시</th><th>일</th><th>월</th><th>년</th></tr><tr>${r1}</tr><tr>${r2}</tr></table></div>
+  <div class="sb"><div class="bt">기질 분석</div><div class="kv">• <b>신강/신약:</b> ${STN[st.lv]} (${st.sc}점)<br>• <b>주요 오행:</b> ${OHN[top[0]]} ${Math.round(cnt[top[0]] / tot * 100)}%, ${OHN[top[1]]} ${Math.round(cnt[top[1]] / tot * 100)}%<br>• <b>현재 대운:</b> ${dtx}<br>• <b>${Y}년:</b> ${GHK[ys]}${ZHK[yb]}년 · ${tenGod(me, ys)}</div></div></div>
+  <div class="al"><div class="ai"><h4 style="color:${syn ? "#2E7D32" : "#C62828"}">${syn ? "⚡ 시너지 포인트" : "⚠️ 충돌 포인트"}</h4><p>${esc(t.point)}</p></div>
+  <div class="ai"><h4 style="color:${pl[0]}">🌱 ${GHK[ch.d[0]]}${ZHK[ch.d[1]]}일주 풀이</h4><p>${esc(ilj[1])}</p></div>
+  <div class="ai"><h4 style="color:#1565C0">📌 상황별 반응 모음</h4><div class="tc"><span class="tg"><b>연애:</b> ${esc(sm.love.tag)}</span><span class="tg"><b>일:</b> ${esc(si.work.tag)}</span><span class="tg"><b>친구:</b> ${esc(sm.friend.tag)}</span><span class="tg"><b>스트레스:</b> ${esc(si.stress.tag)}</span></div></div></div>
+  <div class="mf"><div>💚 찰떡 궁합: <strong>${lab(best[0])}</strong><br>💔 상극 궁합: <strong>${lab(worst[0])}</strong></div><div style="text-align:right;font-size:11px;opacity:.7">SAJU x MBTI<br>ANALYTICS</div></div>`;
+}
+$("bRpt").addEventListener("click", async () => {
+  if (!cur || !mine || !myChart || cur.id !== mine.id) { alert("분석 리포트는 내 결과 화면에서 만들 수 있어요."); return; }
+  const b = $("bRpt"), lb = b.textContent; b.disabled = true; b.textContent = "만드는 중…";
+  try {
+    await loadH2C();
+    let el = $("rpc"); if (!el) { el = document.createElement("div"); el.id = "rpc"; document.body.appendChild(el); }
+    const pl = PAL[cur.ilgan];
+    el.style.setProperty("--k1", pl[0]); el.style.setProperty("--k2", pl[1] + "55"); el.style.setProperty("--k3", pl[1] + "1f");
+    el.innerHTML = reportHTML(cur, myChart);
+    try { await document.fonts.load("16px Pretendard Variable"); await document.fonts.load("24px yg-jalnan"); await document.fonts.ready; } catch {}
+    const cv = await html2canvas(el, {scale: 1080 / 450, backgroundColor: null, logging: false});
+    $("shot").src = cv.toDataURL("image/png");
+    $("imgwrap").style.display = "block";
+    $("imgwrap").scrollIntoView({behavior: "smooth", block: "center"});
+    track("share_img", cur.id);
+  } catch (e) { alert("리포트를 만들지 못했어요. 잠시 후 다시 눌러주세요."); }
+  b.disabled = false; b.textContent = lb;
+});
 $("bImg").addEventListener("click", async () => {
   if (!cur) return;
   try { await document.fonts.load("100px yg-jalnan"); await document.fonts.ready; } catch {}
