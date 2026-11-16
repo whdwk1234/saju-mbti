@@ -284,6 +284,22 @@ input[type=time]{width:100%;font:16px "Noto Sans KR",sans-serif;padding:12px;bor
 #rpc .mf{background:#191F28;color:#fff;border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center}
 #rpc .mf div{font-size:12.5px;line-height:1.6}
 #rpc .mf strong{color:#FFD15C}
+#rpc .mt .qq{margin-top:10px;font-weight:700;color:var(--k1)}
+#rpc .ob{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:6px}
+#rpc .ob span{width:16px;font-weight:700;color:#4E5968}
+#rpc .ob i{flex:1;height:8px;border-radius:4px;background:#F2F4F6;overflow:hidden;display:block}
+#rpc .ob em{display:block;height:100%;border-radius:4px}
+#rpc .ob b{width:14px;text-align:right;color:#4E5968}
+#rpc .sit{margin-top:10px;padding-top:10px;border-top:1px dashed #E5E8EB}
+#rpc .sit:first-of-type{margin-top:4px;padding-top:0;border-top:0}
+#rpc .sit h5{font-size:13px;margin-bottom:4px;color:#191F28}
+#rpc .sit p{margin-top:3px}
+#rpc .ai p+p{margin-top:6px}
+#rpc .dwr{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;margin:4px 0 8px}
+#rpc .dwr span{display:flex;flex-direction:column;align-items:center;border:1px solid #E5E8EB;border-radius:8px;padding:4px 0;font-size:11.5px;font-weight:700;color:#191F28}
+#rpc .dwr span.on{border:2px solid var(--k1);background:var(--k3)}
+#rpc .dwr small{font-size:9px;font-weight:500;color:#8B95A1}
+#rpc .mh{font-weight:700;margin-bottom:2px}
 .wwarn{margin:10px 0 0;font-size:13px;color:#b67a12;font-weight:700}
 </style>
 </head>
@@ -1497,22 +1513,33 @@ function reportHTML(c, ch) {
   const tot = cnt.reduce((a, b) => a + b, 0), top = [0,1,2,3,4].sort((a, b) => cnt[b] - cnt[a]).slice(0, 2);
   const st = strength(ch), du = daeun(ch, SEX);
   const age = Math.floor((Date.now() - ch.ut) / (365.2425 * 864e5));
-  let dtx = "성별 고르면 표시";
-  if (du) { const i = du.list.map(x => x.age <= age).lastIndexOf(true); dtx = i >= 0 ? `${GHK[du.list[i].s]}${ZHK[du.list[i].b]} 대운 (${tenGod(me, du.list[i].s)})` : `${du.start}살부터 시작`; }
+  const di = du ? du.list.map(x => x.age <= age).lastIndexOf(true) : -1;
+  const dtx = !du ? "성별 고르면 표시" : di >= 0 ? `${GHK[du.list[di].s]}${ZHK[du.list[di].b]} 대운 (${tenGod(me, du.list[di].s)})` : `${du.start}살부터 시작`;
   const Y = new Date().getFullYear(), ys = md(Y - 4, 10), yb = md(Y - 4, 12);
   const si = SIT.ilgan[c.ilgan], sm = SIT.mbti[c.mbti], {best, worst} = ranks(c);
-  const ilj = ILJU[gz60(ch.d[0], ch.d[1])], syn = c.chem === "시너지";
-  const lab = r => `${IL[r.c.ilgan][0]}(${IL[r.c.ilgan][1]}) ${r.c.mbti} ${r.pct}%`;
-  return `<div class="hd"><span>사주 × MBTI 분석 리포트</span><b>saju-mbti-tau.vercel.app</b></div>
-  <div class="up"><span><b>${GHK[ch.d[0]]}${ZHK[ch.d[1]]}일주</b> · ${ilj[0]}</span><span>${STN[st.lv]}</span></div>
+  const ilj = ILJU[gz60(ch.d[0], ch.d[1])], syn = c.chem === "시너지", ilnm = `${GHK[ch.d[0]]}${ZHK[ch.d[1]]}일주`;
+  const lab = r => `${IL[r.c.ilgan][0]}(${IL[r.c.ilgan][1]}) ${r.c.mbti}`;
+  const sec = (title, color, body) => `<div class="ai"><h4 style="color:${color}">${title}</h4>${body}</div>`;
+  let h = `<div class="hd"><span>사주 × MBTI 분석 리포트</span><b>saju-mbti-tau.vercel.app</b></div>
+  <div class="up"><span><b>${ilnm}</b> · ${ilj[0]}</span><span>${STN[st.lv]}</span></div>
   <div class="cb"><span class="bi" style="background:${pl[0]}">${il[0]}(${il[1]}) 일간</span><span style="font-weight:700;color:#8B95A1">×</span><span class="bi" style="background:${mp[0]};color:${mGrp(c.mbti) === "SP" ? "#191F28" : "#fff"}">${c.mbti}</span></div>
-  <div class="mt"><h2>"${esc(t.nickname)}"</h2><p>${esc(t.summary)}</p></div>
+  <div class="mt"><h2>"${esc(t.nickname)}"</h2><p>${esc(t.summary)}</p><p class="qq">“${esc(t.share)}”</p></div>
   <div class="dg"><div class="sb"><div class="bt">사주 8글자 (원국표)</div><table><tr><th>시</th><th>일</th><th>월</th><th>년</th></tr><tr>${r1}</tr><tr>${r2}</tr></table></div>
-  <div class="sb"><div class="bt">기질 분석</div><div class="kv">• <b>신강/신약:</b> ${STN[st.lv]} (${st.sc}점)<br>• <b>주요 오행:</b> ${OHN[top[0]]} ${Math.round(cnt[top[0]] / tot * 100)}%, ${OHN[top[1]]} ${Math.round(cnt[top[1]] / tot * 100)}%<br>• <b>현재 대운:</b> ${dtx}<br>• <b>${Y}년:</b> ${GHK[ys]}${ZHK[yb]}년 · ${tenGod(me, ys)}</div></div></div>
-  <div class="al"><div class="ai"><h4 style="color:${syn ? "#2E7D32" : "#C62828"}">${syn ? "⚡ 시너지 포인트" : "⚠️ 충돌 포인트"}</h4><p>${esc(t.point)}</p></div>
-  <div class="ai"><h4 style="color:${pl[0]}">🌱 ${GHK[ch.d[0]]}${ZHK[ch.d[1]]}일주 풀이</h4><p>${esc(ilj[1])}</p></div>
-  <div class="ai"><h4 style="color:#1565C0">📌 상황별 반응 모음</h4><div class="tc"><span class="tg"><b>연애:</b> ${esc(sm.love.tag)}</span><span class="tg"><b>일:</b> ${esc(si.work.tag)}</span><span class="tg"><b>친구:</b> ${esc(sm.friend.tag)}</span><span class="tg"><b>스트레스:</b> ${esc(si.stress.tag)}</span></div></div></div>
-  <div class="mf"><div>💚 찰떡 궁합: <strong>${lab(best[0])}</strong><br>💔 상극 궁합: <strong>${lab(worst[0])}</strong></div><div style="text-align:right;font-size:11px;opacity:.7">SAJU x MBTI<br>ANALYTICS</div></div>`;
+  <div class="sb"><div class="bt">기질 분석</div><div class="kv">• <b>신강/신약:</b> ${STN[st.lv]} (${st.sc}점)<br>• <b>주요 오행:</b> ${OHN[top[0]]} ${Math.round(cnt[top[0]] / tot * 100)}%, ${OHN[top[1]]} ${Math.round(cnt[top[1]] / tot * 100)}%<br>• <b>현재 대운:</b> ${dtx}<br>• <b>${Y}년:</b> ${GHK[ys]}${ZHK[yb]}년 · ${tenGod(me, ys)}</div></div></div>`;
+  h += `<div class="sb"><div class="bt">오행 분포 (${tot}글자)</div>${[0,1,2,3,4].map(e => `<div class="ob"><span>${OHN[e]}</span><i><em style="width:${cnt[e] / tot * 100}%;background:${OHC[e]}"></em></i><b>${cnt[e]}</b></div>`).join("")}</div>`;
+  h += `<div class="al">`;
+  h += sec(syn ? "⚡ 시너지 포인트" : "⚠️ 충돌 포인트", syn ? "#2E7D32" : "#C62828", `<p>${esc(t.point)}</p>`);
+  h += sec("😤 킹받는 포인트", "#C62828", `<p>${esc(t.annoying)}</p>`);
+  h += sec(`🌱 ${ilnm} 풀이 · ${ilj[0]}`, pl[0], `<p>${esc(ilj[1])}</p>`);
+  h += sec(`⚖️ 신강·신약 · ${STN[st.lv]}${st.deuk ? " · 득령" : ""}`, "#4E5968", `<p>${STT[st.lv]}</p>`);
+  h += sec("📌 상황별 분석", "#1565C0", SIT.situations.map(k => `<div class="sit"><h5>${SIT_T[k]}</h5><p><b style="color:${pl[0]}">${il[0]} · ${esc(si[k].tag)}</b> ${esc(si[k].text)}</p><p><b style="color:${mGrp(c.mbti) === "SP" ? "#a87400" : mp[0]}">${c.mbti} · ${esc(sm[k].tag)}</b> ${esc(sm[k].text)}</p></div>`).join(""));
+  if (du) {
+    h += sec(`🔄 대운 흐름 · ${du.fwd ? "순행" : "역행"} · ${du.start}살 시작`, "#6B4FA0", `<div class="dwr">${du.list.map((x, i) => `<span class="${i === di ? "on" : ""}"><small>${x.age}살~</small>${GHK[x.s]}${ZHK[x.b]}<small>${tenGod(me, x.s)}</small></span>`).join("")}</div>${di >= 0 ? `<p><b>지금 ${GHK[du.list[di].s]}${ZHK[du.list[di].b]} 대운 (${du.list[di].age}~${du.list[di].age + 9}살)</b> ${TGL[tenGod(me, du.list[di].s)]}</p>` : ""}`);
+  } else h += sec("🔄 대운 흐름", "#6B4FA0", `<p>성별을 고르면 10년 단위 대운이 나와요.</p>`);
+  h += sec("📅 세운 (해마다 들어오는 기운)", "#B5651D", [0,1,2].map(i => { const y = Y + i, s2 = md(y - 4, 10), b2 = md(y - 4, 12), g = tenGod(me, s2); return `<p><b>${y}년 ${GHK[s2]}${ZHK[b2]}년 · ${g}</b> ${TGL[g].replace("시기", "해")}</p>`; }).join(""));
+  h += `</div>`;
+  h += `<div class="mf"><div><div class="mh">💚 찰떡 궁합 TOP 3</div>${best.map((r, i) => `${i + 1}. <strong>${lab(r)}</strong> ${r.pct}%`).join("<br>")}<div class="mh" style="margin-top:10px">💔 상극 궁합 TOP 3</div>${worst.map((r, i) => `${i + 1}. <strong>${lab(r)}</strong> ${r.pct}%`).join("<br>")}</div><div style="text-align:right;font-size:11px;opacity:.7;align-self:flex-end">SAJU x MBTI<br>ANALYTICS</div></div>`;
+  return h;
 }
 $("bRpt").addEventListener("click", async () => {
   if (!cur || !mine || !myChart || cur.id !== mine.id) { alert("분석 리포트는 내 결과 화면에서 만들 수 있어요."); return; }
